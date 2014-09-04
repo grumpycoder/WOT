@@ -10,6 +10,7 @@ namespace WOT.Server.Models
         [StringLength(100)]
         public string Name { get; set; }
         public bool? IsVIP { get; set; }
+        public bool? IsDonor { get; set; }
         public int? Priority { get; set; }
     }
 }
