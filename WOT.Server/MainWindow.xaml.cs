@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Navigation;
 using System.Windows.Threading;
 using WOT.Server.Models;
+using WOT.Server.Properties;
 
 namespace WOT.Server
 {
@@ -22,17 +26,16 @@ namespace WOT.Server
         public MainWindow()
         {
             InitializeComponent();
-            _canvas = new Canvas
-            {
-                Height = SystemParameters.PrimaryScreenHeight,
-                Width = SystemParameters.PrimaryScreenWidth,
-                Background = Brushes.Black
-            };
-            mainWindow.Content = _canvas;
+            
+            _canvas = WallCanvas; 
+            _canvas.Height = SystemParameters.PrimaryScreenHeight;
+            _canvas.Width = SystemParameters.PrimaryScreenWidth; 
+            _canvas.UpdateLayout();
+            
             _canvasWidth = _canvas.Width;
             _canvasHeight = _canvas.Height;
 
-            var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Properties.Settings.Default.ItemAddSpeed) };
+            var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed) };
             timer.Tick += timer_Tick;
 
             _personlList = CreatePersonList();
@@ -67,10 +70,10 @@ namespace WOT.Server
 
         private TextBlockAttribute CreateNewRandomAttr(bool? vip = false)
         {
-            var leftMargin = Properties.Settings.Default.LeftMargin;
-            var rightMargin = _canvasWidth - Properties.Settings.Default.RightMargin;
-            var maxFontSize = vip.GetValueOrDefault() ? Properties.Settings.Default.MaxFontSizeVIP : Properties.Settings.Default.MaxFontSize; 
-            var minFontSize = vip.GetValueOrDefault() ? Properties.Settings.Default.MinFontSizeVIP : Properties.Settings.Default.MinFontSize; 
+            var leftMargin = Settings.Default.LeftMargin;
+            var rightMargin = _canvasWidth - Settings.Default.RightMargin;
+            var maxFontSize = vip.GetValueOrDefault() ? Settings.Default.MaxFontSizeVIP : Settings.Default.MaxFontSize; 
+            var minFontSize = vip.GetValueOrDefault() ? Settings.Default.MinFontSizeVIP : Settings.Default.MinFontSize; 
 
             var rnd = new Random();
             var xAxis = rnd.Next(leftMargin, rightMargin.ToInt());
@@ -149,6 +152,14 @@ namespace WOT.Server
             //Debug.WriteLine(WallCanvas.Children.Count);
             GC.Collect();
         }
+
+        private void BtnChangeSettings_OnClick(object sender, RoutedEventArgs e)
+        {
+            var n = new SettingsWindow();
+            n.ShowDialog();
+        }
+
+
     }
 
     public class AnimationEventArgs : EventArgs

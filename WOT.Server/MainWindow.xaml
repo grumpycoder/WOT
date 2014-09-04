@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MainWindow" Name="mainWindow" Height="1080" Width="1920" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen" WindowState="Maximized">
     <Canvas Height="1080" Width="1920" Name="WallCanvas" Background="Black">
+        <Button Content="Settings" Width="75" Name="btnChangeSettings" Click="BtnChangeSettings_OnClick"/>
 
     </Canvas>
 </Window>

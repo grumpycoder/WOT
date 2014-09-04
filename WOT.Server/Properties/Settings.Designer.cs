@@ -23,75 +23,99 @@ namespace WOT.Server.Properties {
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("50")]
         public int DefaultScrollSpeed {
             get {
                 return ((int)(this["DefaultScrollSpeed"]));
             }
+            set {
+                this["DefaultScrollSpeed"] = value;
+            }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0.5")]
         public double ItemAddSpeed {
             get {
                 return ((double)(this["ItemAddSpeed"]));
             }
+            set {
+                this["ItemAddSpeed"] = value;
+            }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("10")]
         public int MinFontSize {
             get {
                 return ((int)(this["MinFontSize"]));
             }
+            set {
+                this["MinFontSize"] = value;
+            }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("40")]
         public int MaxFontSize {
             get {
                 return ((int)(this["MaxFontSize"]));
             }
+            set {
+                this["MaxFontSize"] = value;
+            }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("30")]
         public int MinFontSizeVIP {
             get {
                 return ((int)(this["MinFontSizeVIP"]));
             }
+            set {
+                this["MinFontSizeVIP"] = value;
+            }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("40")]
         public int MaxFontSizeVIP {
             get {
                 return ((int)(this["MaxFontSizeVIP"]));
             }
+            set {
+                this["MaxFontSizeVIP"] = value;
+            }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("10")]
         public int LeftMargin {
             get {
                 return ((int)(this["LeftMargin"]));
             }
+            set {
+                this["LeftMargin"] = value;
+            }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("50")]
         public int RightMargin {
             get {
                 return ((int)(this["RightMargin"]));
+            }
+            set {
+                this["RightMargin"] = value;
             }
         }
     }
