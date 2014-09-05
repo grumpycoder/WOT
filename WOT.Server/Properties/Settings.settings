@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="DefaultScrollSpeed" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">50</Value>
+      <Value Profile="(Default)">3</Value>
     </Setting>
     <Setting Name="ItemAddSpeed" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0.5</Value>
