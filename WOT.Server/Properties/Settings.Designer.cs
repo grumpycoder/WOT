@@ -25,7 +25,7 @@ namespace WOT.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3")]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
         public int DefaultScrollSpeed {
             get {
                 return ((int)(this["DefaultScrollSpeed"]));
@@ -61,7 +61,7 @@ namespace WOT.Server.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("40")]
+        [global::System.Configuration.DefaultSettingValueAttribute("30")]
         public int MaxFontSize {
             get {
                 return ((int)(this["MaxFontSize"]));

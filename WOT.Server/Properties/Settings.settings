@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="DefaultScrollSpeed" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">3</Value>
+      <Value Profile="(Default)">10</Value>
     </Setting>
     <Setting Name="ItemAddSpeed" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0.5</Value>
@@ -12,7 +12,7 @@
       <Value Profile="(Default)">10</Value>
     </Setting>
     <Setting Name="MaxFontSize" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">40</Value>
+      <Value Profile="(Default)">30</Value>
     </Setting>
     <Setting Name="MinFontSizeVIP" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">30</Value>

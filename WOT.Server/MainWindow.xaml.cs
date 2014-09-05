@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Navigation;
 using System.Windows.Threading;
 using WOT.Server.Models;
 using WOT.Server.Properties;
@@ -18,27 +15,28 @@ namespace WOT.Server
     public partial class MainWindow
     {
         private Person _currentPerson;
-        private readonly IList<Person> _personlList;
+        private readonly IList<Person> _personList;
         private readonly Canvas _canvas;
         private readonly double _canvasWidth;
         private readonly double _canvasHeight;
-
+        private readonly DispatcherTimer timer; 
         public MainWindow()
         {
             InitializeComponent();
             
-            _canvas = WallCanvas; 
+            _canvas = WallCanvas;
             _canvas.Height = SystemParameters.PrimaryScreenHeight;
             _canvas.Width = SystemParameters.PrimaryScreenWidth; 
             _canvas.UpdateLayout();
-            
+
             _canvasWidth = _canvas.Width;
             _canvasHeight = _canvas.Height;
+            ExpanderSettings.Width = _canvasWidth; 
 
-            var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed) };
+            timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed) };
             timer.Tick += timer_Tick;
 
-            _personlList = CreatePersonList();
+            _personList = CreatePersonList();
 
             timer.Start();
 
@@ -63,7 +61,7 @@ namespace WOT.Server
 
         void timer_Tick(object sender, EventArgs e)
         {
-            _currentPerson = _personlList.Next(_currentPerson);
+            _currentPerson = _personList.Next(_currentPerson);
             var attr = CreateNewRandomAttr(_currentPerson.IsVIP);
             CreateNewTextBlock(_currentPerson, attr);
         }
@@ -80,7 +78,7 @@ namespace WOT.Server
             var yAxis = rnd.Next(0, 10);
             var size = rnd.Next(minFontSize, maxFontSize);
 
-            var speed = (Properties.Settings.Default.DefaultScrollSpeed / (double)size) * 10;
+            var speed = (Settings.Default.DefaultScrollSpeed / (double)size) * 10;
             var color = RandomColor();
 
             var attr = new TextBlockAttribute
@@ -92,7 +90,7 @@ namespace WOT.Server
                 Size = size,
                 Color = color,
             };
-            if (vip.GetValueOrDefault()) attr.ZIndex = 999;
+            if (vip.GetValueOrDefault()) attr.ZIndex = 998;
 
             rnd = null;
             GC.Collect();
@@ -149,17 +147,50 @@ namespace WOT.Server
 
             result.BeginAnimation(TopProperty, null);
             _canvas.Children.Remove(result);
-            //Debug.WriteLine(WallCanvas.Children.Count);
             GC.Collect();
         }
 
-        private void BtnChangeSettings_OnClick(object sender, RoutedEventArgs e)
+        private void btnSaveSettings_Click(object sender, RoutedEventArgs e)
         {
-            var n = new SettingsWindow();
-            n.ShowDialog();
+            Settings.Default.Save();
+            ExpanderSettings.IsExpanded = false;
         }
 
+        private void btnReset_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.Default.Reset();
+        }
 
+        private void sldAddSpeed_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Settings.Default.ItemAddSpeed = e.NewValue; 
+            if(timer != null) timer.Interval = TimeSpan.FromSeconds(e.NewValue); 
+        }
+
+        private void SldScrollSpeed_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Settings.Default.DefaultScrollSpeed = e.NewValue.ToInt(); 
+        }
+
+        private void SldMaxFont_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Settings.Default.MaxFontSize = e.NewValue.ToInt(); 
+        }
+
+        private void SldMinFont_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Settings.Default.MinFontSize = e.NewValue.ToInt(); 
+        }
+
+        private void SldMinFontSizeVIP_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Settings.Default.MinFontSizeVIP = e.NewValue.ToInt(); 
+        }
+
+        private void SldMaxFontSizeVIP_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Settings.Default.MaxFontSizeVIP = e.NewValue.ToInt(); 
+        }
     }
 
     public class AnimationEventArgs : EventArgs
