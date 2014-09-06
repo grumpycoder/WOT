@@ -23,6 +23,38 @@ namespace WOT.Kiosk
         public MainWindow()
         {
             InitializeComponent();
+            //tbFirstName.SizeChanged += new SizeChangedEventHandler(tb_SizeChanged);
+            //tbFirstName.TextChanged += tbTextChanged;
+        }
+
+        private void tbTextChanged(object sender, TextChangedEventArgs textChangedEventArgs)
+        {
+            RecalcFontSize();
+        }
+
+        void tb_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            RecalcFontSize();
+        }
+
+        private void RecalcFontSize()
+        {
+            if (tbFirstName == null) return;
+            Size constraint = new Size(tbFirstName.ActualWidth, tbFirstName.ActualHeight);
+            tbFirstName.Measure(constraint);
+            while (tbFirstName.DesiredSize.Height < tbFirstName.ActualHeight)
+            {
+                tbFirstName.FontSize += 1;
+                tbFirstName.Measure(constraint);
+            }
+            tbFirstName.FontSize -= 1;
+        }
+
+        private void text_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            RecalcFontSize();
         }
     }
+
+
 }
