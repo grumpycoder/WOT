@@ -5,6 +5,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
@@ -22,6 +24,7 @@ namespace WOT.Server
         private readonly double _canvasWidth;
         private readonly double _canvasHeight;
         private readonly DispatcherTimer timer;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -29,6 +32,8 @@ namespace WOT.Server
             _canvas = WallCanvas;
             _canvas.Height = SystemParameters.PrimaryScreenHeight;
             _canvas.Width = SystemParameters.PrimaryScreenWidth;
+
+            SetDataBindings();
             _canvas.UpdateLayout();
 
             _canvasWidth = _canvas.Width;
@@ -41,6 +46,29 @@ namespace WOT.Server
             _personList = CreatePersonList();
 
             timer.Start();
+
+        }
+
+        private void SetDataBindings()
+        {
+            var bMinFontSize = new Binding {Source = Settings.Default, Path = new PropertyPath("MinFontSize")};
+            sldMinFont.SetBinding(RangeBase.ValueProperty, bMinFontSize);
+
+            var bMaxFontSize = new Binding { Source = Settings.Default, Path = new PropertyPath("MaxFontSize") };
+            sldMaxFont.SetBinding(RangeBase.ValueProperty, bMaxFontSize);
+
+            var bMinFontSizeVIP = new Binding { Source = Settings.Default, Path = new PropertyPath("MinFontSizeVIP") };
+            sldMinFontSizeVIP.SetBinding(RangeBase.ValueProperty, bMinFontSizeVIP);
+
+            var bMaxFontSizeVIP = new Binding { Source = Settings.Default, Path = new PropertyPath("MaxFontSizeVIP") };
+            sldMaxFontSizeVIP.SetBinding(RangeBase.ValueProperty, bMaxFontSizeVIP);
+
+            var bScrollSpeed = new Binding { Source = Settings.Default, Path = new PropertyPath("DefaultScrollSpeed") };
+            sldScrollSpeed.SetBinding(RangeBase.ValueProperty, bScrollSpeed);
+
+            var bAddSpeed = new Binding { Source = Settings.Default, Path = new PropertyPath("ItemAddSpeed") };
+            sldAddSpeed.SetBinding(RangeBase.ValueProperty, bAddSpeed);
+
 
         }
 
@@ -160,79 +188,51 @@ namespace WOT.Server
 
         private void btnReset_Click(object sender, RoutedEventArgs e)
         {
-            //foreach (SettingsProperty currentProperty in Properties.Settings.Default.Properties)
-            //{
-            //    //Debug.WriteLine(currentProperty.Name);
-            //    //Properties.Settings.Default[currentProperty.Name] = result.ToString();
-            //    //Properties.Settings.Default.Save();
-            //}
-            //var settings = System.Configuration.ConfigurationManager.AppSettings;
-            //Settings.Default.ItemAddSpeed = Convert.ToDouble(settings["ItemAddSpeed"]);
-
-            //foreach (SettingsProperty currentProperty in Properties.Settings.Default.Properties)
-            //{
-            //    Settings.Default.Properties["MyPropertyName"].Reset();
-            //    Debug.WriteLine(string.Format("{0} {1}", currentProperty.Name, currentProperty.DefaultValue));
-            //}
-
-            //foreach (var key in settings.AllKeys)
-            //{
-
-            //    Debug.WriteLine(settings.GetValues(key));
-            //    Debug.WriteLine(key);
-            //}
-            //foreach (SettingsProperty currentProperty in ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).AppSettings.Settings)
-            //{
-            //    Debug.WriteLine(currentProperty.Name);
-            //    //Properties.Settings.Default[currentProperty.Name] = result.ToString();
-            //    //Properties.Settings.Default.Save();
-            //}
-
-            //var settings = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).AppSettings.Settings;
-            //foreach (var setting in settings)
-            //{
-
-            //}
-
-            ////Settings.Default.ItemAddSpeed = 0.1;
-            //var s = Settings.Default.Properties["ItemAddSpeed"].DefaultValue;
-            //var s2 = Settings.Default.ItemAddSpeed; 
-            Properties.Settings.Default.Reset();
-            //s = Settings.Default.Properties["ItemAddSpeed"].DefaultValue;
-            //s2 = Settings.Default.ItemAddSpeed; 
-
-            Settings.Default.Save();
+            Settings.Default.Reset();
+            Settings.Default.Reload();
         }
 
         private void sldAddSpeed_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            Settings.Default.ItemAddSpeed = e.NewValue;
+            //Settings.Default.ItemAddSpeed = e.NewValue;
             if (timer != null) timer.Interval = TimeSpan.FromSeconds(e.NewValue);
         }
 
         private void SldScrollSpeed_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            Settings.Default.DefaultScrollSpeed = e.NewValue.ToInt();
+            //Settings.Default.DefaultScrollSpeed = e.NewValue.ToInt();
         }
 
         private void SldMaxFont_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            Settings.Default.MaxFontSize = e.NewValue.ToInt();
+            if (Settings.Default.MinFontSize > Settings.Default.MaxFontSize)
+            {
+                Settings.Default.MinFontSize = Settings.Default.MinFontSize - 1;
+            }
         }
 
         private void SldMinFont_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            Settings.Default.MinFontSize = e.NewValue.ToInt();
+            if (Settings.Default.MaxFontSize < Settings.Default.MinFontSize)
+            {
+                Settings.Default.MaxFontSize = Settings.Default.MaxFontSize + 1;
+            }
         }
 
         private void SldMinFontSizeVIP_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            Settings.Default.MinFontSizeVIP = e.NewValue.ToInt();
+            if (Settings.Default.MaxFontSizeVIP < Settings.Default.MinFontSizeVIP)
+            {
+                Settings.Default.MaxFontSizeVIP = Settings.Default.MaxFontSizeVIP + 1;
+            }
         }
 
         private void SldMaxFontSizeVIP_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            Settings.Default.MaxFontSizeVIP = e.NewValue.ToInt();
+            if (Settings.Default.MinFontSizeVIP > Settings.Default.MaxFontSizeVIP)
+            {
+                Settings.Default.MinFontSizeVIP = Settings.Default.MinFontSizeVIP - 1;
+            }
         }
     }
 
