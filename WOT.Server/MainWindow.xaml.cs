@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -10,6 +10,7 @@ using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using Microsoft.AspNet.SignalR.Client;
 using WOT.Server.Models;
 using WOT.Server.Properties;
 
@@ -25,10 +26,15 @@ namespace WOT.Server
         private readonly double _canvasHeight;
         private readonly DispatcherTimer timer;
 
+        public string ServerURI = Settings.Default.ServerURI;
+        public string HubName = Settings.Default.HubName; 
+
+        public IHubProxy HubProxy { get; set; }
+        public HubConnection Conn { get; set; }
+
         public MainWindow()
         {
             InitializeComponent();
-
             _canvas = WallCanvas;
             _canvas.Height = SystemParameters.PrimaryScreenHeight;
             _canvas.Width = SystemParameters.PrimaryScreenWidth;
@@ -47,11 +53,49 @@ namespace WOT.Server
 
             timer.Start();
 
+            ConnectAsync();
+        }
+
+        public void AddPersonToList(string name)
+        {
+            var person = new Person()
+            {
+                Name = name,
+                Id = _personList.Count + 1,
+                IsVIP = true
+            };
+
+            _personList.Add(person);
+            AddPersonToDisplay(person);
+        }
+
+        public void AddPersonToDisplay(Person person)
+        {
+            CreateNewTextBlock(person, CreateNewRandomAttr(person.IsVIP));
+        }
+
+        private async void ConnectAsync()
+        {
+            Conn = new HubConnection(ServerURI);
+            HubProxy = Conn.CreateHubProxy(HubName);
+            
+            HubProxy.On<string, string>("sendName", (name, message) => this.Dispatcher.Invoke(() => AddPersonToList(message)));
+            try
+            {
+                await Conn.Start();
+            }
+            catch (HttpRequestException e)
+            {
+                Debug.WriteLine("Unable to connect to server: Start server before connecting clients");
+                Debug.WriteLine(e.InnerException.ToString());
+                return;
+            }
+            Debug.WriteLine("Connected to server at {0}", ServerURI);
         }
 
         private void SetDataBindings()
         {
-            var bMinFontSize = new Binding {Source = Settings.Default, Path = new PropertyPath("MinFontSize")};
+            var bMinFontSize = new Binding { Source = Settings.Default, Path = new PropertyPath("MinFontSize") };
             sldMinFont.SetBinding(RangeBase.ValueProperty, bMinFontSize);
 
             var bMaxFontSize = new Binding { Source = Settings.Default, Path = new PropertyPath("MaxFontSize") };
@@ -96,7 +140,7 @@ namespace WOT.Server
             CreateNewTextBlock(_currentPerson, attr);
         }
 
-        private TextBlockAttribute CreateNewRandomAttr(bool? vip = false)
+        public TextBlockAttribute CreateNewRandomAttr(bool? vip = false)
         {
             var leftMargin = Settings.Default.LeftMargin;
             var rightMargin = _canvasWidth - Settings.Default.RightMargin;
@@ -139,7 +183,7 @@ namespace WOT.Server
             return color;
         }
 
-        private void CreateNewTextBlock(Person person, TextBlockAttribute attr)
+        public void CreateNewTextBlock(Person person, TextBlockAttribute attr)
         {
             var animation = new DoubleAnimation
             {
@@ -147,7 +191,7 @@ namespace WOT.Server
                 To = attr.Bottom,
                 Duration = new Duration(TimeSpan.FromSeconds(attr.Speed))
             };
-
+            
             var textBlock = new TextBlock
             {
                 Name = "TextBlock" + person.Id,
@@ -234,6 +278,7 @@ namespace WOT.Server
                 Settings.Default.MinFontSizeVIP = Settings.Default.MinFontSizeVIP - 1;
             }
         }
+
     }
 
     public class AnimationEventArgs : EventArgs
@@ -258,4 +303,5 @@ namespace WOT.Server
         public FontWeight Weight { get; set; }
         public Color Color { get; set; }
     }
+
 }

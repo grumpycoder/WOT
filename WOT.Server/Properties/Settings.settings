@@ -26,5 +26,11 @@
     <Setting Name="RightMargin" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">50</Value>
     </Setting>
+    <Setting Name="ServerURI" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://localhost:8080/signalr</Value>
+    </Setting>
+    <Setting Name="HubName" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">WallHub</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -118,5 +118,23 @@ namespace WOT.Server.Properties {
                 this["RightMargin"] = value;
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:8080/signalr")]
+        public string ServerURI {
+            get {
+                return ((string)(this["ServerURI"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("WallHub")]
+        public string HubName {
+            get {
+                return ((string)(this["HubName"]));
+            }
+        }
     }
 }

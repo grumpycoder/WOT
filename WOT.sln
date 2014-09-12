@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WOT.Server", "WOT.Server\WO
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WOT.Kiosk", "WOT.Kiosk\WOT.Kiosk.csproj", "{BE1F6167-56B8-44A8-9E10-19E4B7240116}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WOT.HubService", "WOT.HubService\WOT.HubService.csproj", "{4D6E0BB7-51A5-4265-B894-363E4D57B815}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{BE1F6167-56B8-44A8-9E10-19E4B7240116}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE1F6167-56B8-44A8-9E10-19E4B7240116}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE1F6167-56B8-44A8-9E10-19E4B7240116}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D6E0BB7-51A5-4265-B894-363E4D57B815}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D6E0BB7-51A5-4265-B894-363E4D57B815}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D6E0BB7-51A5-4265-B894-363E4D57B815}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D6E0BB7-51A5-4265-B894-363E4D57B815}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
