@@ -1,55 +1,43 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Microsoft.AspNet.SignalR.Client;
 using WOT.Kiosk.Properties;
 
 namespace WOT.Kiosk
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
+
     public partial class MainWindow : Window
     {
         public string KioskName = Settings.Default.KioskName;
         public IHubProxy HubProxy { get; set; }
-        private string ServerURI = Settings.Default.ServerURI;
-        private string HubName = Settings.Default.HubName; 
+        private readonly string ServerURI = Settings.Default.ServerURI;
+        private readonly string HubName = Settings.Default.HubName;
         public HubConnection Connection { get; set; }
-
+        
         public MainWindow()
         {
+
             InitializeComponent();
 
             mainWindow.Height = Settings.Default.AppHeight;
             mainWindow.Width = Settings.Default.AppWidth;
             ConnectAsync();
+
+            //TODO: Try reconnect when server back online
         }
-
-
 
         private void BtnSave_OnClick(object sender, RoutedEventArgs e)
         {
             HubProxy.Invoke("Send", KioskName, tbFirstName.Text);
+            //TODO: Save name to persistent storage
         }
 
         private async void ConnectAsync()
         {
             Connection = new HubConnection(ServerURI);
-
+            Connection.Closed += ConnectionOnClosed;
+            Connection.StateChanged += ConnectionOnStateChanged;
             HubProxy = Connection.CreateHubProxy(HubName);
             HubProxy.On<string, string>("sendName",
                 (name, message) =>
@@ -62,12 +50,31 @@ namespace WOT.Kiosk
             }
             catch (HttpRequestException e)
             {
-                StatusText.Content = "Unable to connect to server: Start server before connecting clients";
-                StatusText.Content = e.InnerException.ToString();
+                //TODO: Log message of error
                 return;
             }
-            StatusText.Content = "Connected to server at " + ServerURI;
         }
 
+        private void ConnectionOnStateChanged(StateChange stateChange)
+        {
+            if (Connection.State == ConnectionState.Disconnected)
+            {
+                this.Dispatcher.Invoke(() => StatusText.Content = "Disconnected");
+            }
+            if (Connection.State == ConnectionState.Connecting)
+            {
+                this.Dispatcher.Invoke(() => StatusText.Content = "Connecting");
+            }
+            if (Connection.State == ConnectionState.Connected)
+            {
+                this.Dispatcher.Invoke(() => StatusText.Content = "Connected");
+            }
+            this.Dispatcher.Invoke(() => StatusText.Content = Connection.State);
+        }
+
+        private void ConnectionOnClosed()
+        {
+            this.Dispatcher.Invoke(()=> StatusText.Content = "Disconnected");
+        }
     }
 }

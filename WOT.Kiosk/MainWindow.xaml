@@ -1,77 +1,68 @@
-﻿<Window x:Class="WOT.Kiosk.MainWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Name="mainWindow">
+        xmlns:local="clr-namespace:WOT.Kiosk" x:Class="WOT.Kiosk.MainWindow"
+        Title="MainWindow" x:Name="mainWindow">
     <Window.Resources>
         <ScaleTransform x:Key="FontStretchCondensed" ScaleX="0.8" />
         <ScaleTransform x:Key="FontStretchExpanded" ScaleX="2.0" />
         <Style x:Key="TextBoxStyle" TargetType="{x:Type TextBox}">
             <Setter Property="FontSize" Value="24" />
-            <Setter Property="TextAlignment" Value="Left"></Setter>
-            <Setter Property="VerticalContentAlignment" Value="Bottom"></Setter>
-            <!--<Setter Property="HorizontalAlignment" Value="Left"></Setter>
-            <Setter Property="VerticalAlignment" Value="Bottom"></Setter>-->
-            <!--<Setter Property="FontFamily" Value="Calibri" />-->
-            <!--<Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="Foreground" Value="White"/>-->
+            <Setter Property="TextAlignment" Value="Left"/>
+            <Setter Property="VerticalContentAlignment" Value="Bottom"/>
         </Style>
         <Style x:Key="TextBlockStyle" TargetType="{x:Type TextBlock}">
-            <Setter Property="Margin" Value="5"></Setter>
-            <Setter Property="FontSize" Value="48"></Setter>
-            <Setter Property="HorizontalAlignment" Value="Right"></Setter>
-            <Setter Property="VerticalAlignment" Value="Bottom"></Setter>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="FontSize" Value="48"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="VerticalAlignment" Value="Bottom"/>
         </Style>
     </Window.Resources>
-    
-    <Grid ShowGridLines="True">
+
+    <Grid ShowGridLines="False">
         <Grid.RowDefinitions>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition></ColumnDefinition>
-            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
-        <TextBlock TextWrapping="WrapWithOverflow" Margin="5" Padding="5" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
-                    Lorem ipsum dolor sit amet, vix at ubique libris electram. Perfecto salutatus mei in, id vero electram has. Ius diceret ponderum instructior at. Luptatum deseruisse inciderint ne nec, te nec quem malorum gubergren, te commune detraxit nec.
-
-Cu per dico erroribus incorrupte, ea eam quod volumus. Id has nibh philosophia, nam an invidunt maluisset molestiae. Vis ut commodo recteque, pericula evertitur ius no. Ut est feugait tractatos scripserit.
-
-Sit omnesque apeirian tincidunt ad. Illum novum urbanitas ut his, an his ipsum putent discere. Principes persecuti vix id, pro alterum eruditi in. Mazim semper at mei, ei eos populo dignissim, molestiae tincidunt definiebas his an. Est ei movet dolore aperiam, mel quem dolor inciderint at. Ridens iisque ornatus ius in.</TextBlock>
+        <TextBlock TextWrapping="WrapWithOverflow" Margin="5" Padding="5" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"><Run Text="Lorem ipsum dolor sit amet, vix at ubique libris electram. Perfecto salutatus mei in, id vero electram has. Ius diceret ponderum instructior at. Luptatum deseruisse inciderint ne nec, te nec quem malorum gubergren, te commune detraxit nec. Cu per dico erroribus incorrupte, ea eam quod volumus. Id has nibh philosophia, nam an invidunt maluisset molestiae. Vis ut commodo recteque, pericula evertitur ius no. Ut est feugait tractatos scripserit. Sit omnesque apeirian tincidunt ad. Illum novum urbanitas ut his, an his ipsum putent discere. Principes persecuti vix id, pro alterum eruditi in. Mazim semper at mei, ei eos populo dignissim, molestiae tincidunt definiebas his an. Est ei movet dolore aperiam, mel quem dolor inciderint at. Ridens iisque ornatus ius in."/></TextBlock>
 
 
         <!--<Viewbox Grid.Column="0" Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Right" VerticalAlignment="Bottom">-->
-        <TextBlock Grid.Column="0" Grid.Row="1" Text="First Name" Style="{StaticResource TextBlockStyle}" Name="lblFName"></TextBlock>
+        <TextBlock Grid.Column="0" Grid.Row="1" Text="First Name" Style="{StaticResource TextBlockStyle}" x:Name="lblFName"/>
         <!--</Viewbox>-->
-        
+
         <!--<Viewbox Grid.Column="0" Grid.Row="2" Stretch="Uniform" HorizontalAlignment="Right" VerticalAlignment="Bottom">-->
-        <TextBlock Text="Last Name" Grid.Column="0" Grid.Row="2" Style="{StaticResource TextBlockStyle}" ></TextBlock>
+        <TextBlock Text="Last Name" Grid.Column="0" Grid.Row="2" Style="{StaticResource TextBlockStyle}" />
         <!--</Viewbox>-->
         <!--<Viewbox Grid.Column="0" Grid.Row="3" Stretch="Uniform" HorizontalAlignment="Right" VerticalAlignment="Bottom">-->
-        <TextBlock Text="Email" Grid.Column="0" Grid.Row="3" Style="{StaticResource TextBlockStyle}" ></TextBlock>
+        <TextBlock Text="Email" Grid.Column="0" Grid.Row="3" Style="{StaticResource TextBlockStyle}" />
         <!--</Viewbox>-->
 
         <!--<Viewbox Grid.Column="1" Grid.Row="1" Stretch="UniformToFill" VerticalAlignment="Bottom">-->
-        <TextBox Grid.Column="1" Grid.Row="1" Margin="5" Name="tbFirstName" Style="{StaticResource TextBoxStyle}">
-        </TextBox>
+        <TextBox Grid.Column="1" Grid.Row="1" Margin="5" x:Name="tbFirstName" Style="{StaticResource TextBoxStyle}"/>
         <!--</Viewbox>-->
 
         <!--<Viewbox Grid.Column="1" Grid.Row="2" Stretch="UniformToFill" VerticalAlignment="Bottom">-->
-        <TextBox Grid.Column="1" Grid.Row="2" Margin="5" Name="tbLastName" Style="{StaticResource TextBoxStyle}"></TextBox>
+        <TextBox Grid.Column="1" Grid.Row="2" Margin="5" x:Name="tbLastName" Style="{StaticResource TextBoxStyle}"/>
         <!--</Viewbox>-->
 
         <!--<Viewbox Grid.Column="1" Grid.Row="3" Stretch="UniformToFill" VerticalAlignment="Bottom">-->
-        <TextBox Grid.Column="1" Grid.Row="3" Margin="5" Name="tbEmail" AcceptsReturn="True" Style="{StaticResource TextBoxStyle}" >
-        </TextBox>
+        <TextBox Grid.Column="1" Grid.Row="3" Margin="5" x:Name="tbEmail" AcceptsReturn="True" Style="{StaticResource TextBoxStyle}" />
         <!--</Viewbox>-->
 
-        <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Name="btnSave" Click="BtnSave_OnClick">Save</Button>
-        <Label Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Name="StatusText"></Label>
+        <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" x:Name="btnSave" Click="BtnSave_OnClick" Content="Save"/>
+
+        <Label Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" HorizontalContentAlignment="Right" x:Name="StatusText">
+        </Label>
     </Grid>
 
 

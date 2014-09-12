@@ -12,6 +12,7 @@ using WOT.HubService.Properties;
 
 namespace WOT.HubService
 {
+      
     class Program
     {
         public IDisposable SignalR;
@@ -28,18 +29,7 @@ namespace WOT.HubService
 
         }
 
-        private void StartServer()
-        {
-            try
-            {
-                SignalR = WebApp.Start(ServerURI);
-            }
-            catch (TargetInvocationException e)
-            {
-                Console.WriteLine("Unable to start server: {0}", e.InnerException.Message);
-            }
-            Console.WriteLine("Server started successfully: {0}", ServerURI);
-        }
+     
     }
 
     class Startup

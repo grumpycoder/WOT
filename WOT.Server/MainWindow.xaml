@@ -345,6 +345,7 @@
                     <RowDefinition/>
                     <RowDefinition/>
                     <RowDefinition/>
+                    <RowDefinition/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
@@ -406,6 +407,8 @@
                     <Button x:Name="btnResetSettings" Style="{StaticResource MetroButton}" Content="Reset" Margin="3" Click="btnReset_Click" Panel.ZIndex="999" />
                     <Button x:Name="btnSaveSettings" Style="{StaticResource MetroButton}" Content="Save" Margin="3" Click="btnSaveSettings_Click" Panel.ZIndex="999" />
                 </WrapPanel>
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4" HorizontalAlignment="Right"  Name="ConnectionStatus" Style="{StaticResource SettingTextBlockStyle}"></TextBlock>
             </Grid>
         </Expander>
     </Canvas>

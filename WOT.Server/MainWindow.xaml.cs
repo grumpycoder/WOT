@@ -77,6 +77,7 @@ namespace WOT.Server
         private async void ConnectAsync()
         {
             Conn = new HubConnection(ServerURI);
+            Conn.StateChanged += ConnOnStateChanged;
             HubProxy = Conn.CreateHubProxy(HubName);
             
             HubProxy.On<string, string>("sendName", (name, message) => this.Dispatcher.Invoke(() => AddPersonToList(message)));
@@ -91,6 +92,11 @@ namespace WOT.Server
                 return;
             }
             Debug.WriteLine("Connected to server at {0}", ServerURI);
+        }
+
+        private void ConnOnStateChanged(StateChange stateChange)
+        {
+            this.Dispatcher.Invoke(() => ConnectionStatus.Text = Conn.State.ToString());
         }
 
         private void SetDataBindings()
