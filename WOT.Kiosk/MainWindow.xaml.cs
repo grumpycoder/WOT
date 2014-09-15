@@ -36,7 +36,6 @@ namespace WOT.Kiosk
         private async void ConnectAsync()
         {
             Connection = new HubConnection(ServerURI);
-            Connection.Closed += ConnectionOnClosed;
             Connection.StateChanged += ConnectionOnStateChanged;
             HubProxy = Connection.CreateHubProxy(HubName);
             HubProxy.On<string, string>("sendName",
@@ -72,9 +71,5 @@ namespace WOT.Kiosk
             this.Dispatcher.Invoke(() => StatusText.Content = Connection.State);
         }
 
-        private void ConnectionOnClosed()
-        {
-            this.Dispatcher.Invoke(()=> StatusText.Content = "Disconnected");
-        }
     }
 }

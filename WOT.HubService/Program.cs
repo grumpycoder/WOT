@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using Microsoft.Owin.Cors;
@@ -18,7 +14,6 @@ namespace WOT.HubService
         public IDisposable SignalR;
         public static string ServerURI = Settings.Default.ServerURI;
 
-
         static void Main(string[] args)
         {
             using (WebApp.Start<Startup>(ServerURI))
@@ -26,9 +21,7 @@ namespace WOT.HubService
                 Console.WriteLine("Server started: {0}", ServerURI);
                 Console.ReadLine();
             }
-
         }
-
      
     }
 

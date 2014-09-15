@@ -61,7 +61,7 @@ namespace WOT.Kiosk.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Kiosk1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
         public string KioskName {
             get {
                 return ((string)(this["KioskName"]));

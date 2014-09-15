@@ -15,7 +15,7 @@
       <Value Profile="(Default)">http://localhost:8080/signalr</Value>
     </Setting>
     <Setting Name="KioskName" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">Kiosk1</Value>
+      <Value Profile="(Default)">4</Value>
     </Setting>
   </Settings>
 </SettingsFile>

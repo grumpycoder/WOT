@@ -24,6 +24,7 @@ namespace WOT.Server
         private readonly Canvas _canvas;
         private readonly double _canvasWidth;
         private readonly double _canvasHeight;
+        private readonly double _quadSize; 
         private readonly DispatcherTimer timer;
 
         public string ServerURI = Settings.Default.ServerURI;
@@ -44,34 +45,17 @@ namespace WOT.Server
 
             _canvasWidth = _canvas.Width;
             _canvasHeight = _canvas.Height;
+            _quadSize = _canvasWidth/4; 
             ExpanderSettings.Width = _canvasWidth;
 
             timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed) };
             timer.Tick += timer_Tick;
 
-            _personList = CreatePersonList();
+            _personList = CreateLocalPersonList();
 
             timer.Start();
 
             ConnectAsync();
-        }
-
-        public void AddPersonToList(string name)
-        {
-            var person = new Person()
-            {
-                Name = name,
-                Id = _personList.Count + 1,
-                IsVIP = true
-            };
-
-            _personList.Add(person);
-            AddPersonToDisplay(person);
-        }
-
-        public void AddPersonToDisplay(Person person)
-        {
-            CreateNewTextBlock(person, CreateNewRandomAttr(person.IsVIP));
         }
 
         private async void ConnectAsync()
@@ -79,8 +63,8 @@ namespace WOT.Server
             Conn = new HubConnection(ServerURI);
             Conn.StateChanged += ConnOnStateChanged;
             HubProxy = Conn.CreateHubProxy(HubName);
-            
-            HubProxy.On<string, string>("sendName", (name, message) => this.Dispatcher.Invoke(() => AddPersonToList(message)));
+
+            HubProxy.On<string, string>("sendName", (name, message) => this.Dispatcher.Invoke(() => AddPersonToListFromKiosk(message, name)));
             try
             {
                 await Conn.Start();
@@ -94,9 +78,72 @@ namespace WOT.Server
             Debug.WriteLine("Connected to server at {0}", ServerURI);
         }
 
-        private void ConnOnStateChanged(StateChange stateChange)
+        private static IList<Person> CreateLocalPersonList()
         {
-            this.Dispatcher.Invoke(() => ConnectionStatus.Text = Conn.State.ToString());
+            var list = new List<Person>();
+
+            for (int i = 1; i < 101; i++)
+            {
+                list.Add(new Person
+                {
+                    Name = "Person " + (i % 4 == 0 ? "VIP" : "") + i,
+                    Id = i,
+                    IsDonor = true,
+                    IsVIP = i % 4 == 0
+                });
+            }
+            return list;
+        }
+
+        public void CreateNewTextBlock(Person person, TextBlockAttribute attr)
+        {
+            var animation = new DoubleAnimation
+            {
+                From = attr.Top,
+                To = attr.Bottom,
+                Duration = new Duration(TimeSpan.FromSeconds(attr.Speed))
+            };
+
+            var textBlock = new TextBlock
+            {
+                Name = "TextBlock" + person.Id,
+                Text = person.Name,
+                Tag = "TextBlock" + person.Id,
+                FontSize = attr.Size,
+                FontWeight = attr.Weight,
+                Foreground = new SolidColorBrush(attr.Color)
+            };
+
+            var e = new AnimationEventArgs { TagName = textBlock.Name };
+            animation.Completed += (sender, args) => AnimationOnCompleted(e);
+
+            Canvas.SetLeft(textBlock, attr.Left);
+            Canvas.SetTop(textBlock, attr.Top);
+            Panel.SetZIndex(textBlock, attr.ZIndex);
+            _canvas.Children.Add(textBlock);
+
+            textBlock.BeginAnimation(TopProperty, animation);
+            GC.Collect();
+        }
+
+        public void AddPersonToListFromKiosk(string name, string location)
+        {
+            var person = new Person()
+            {
+                Name = name,
+                Id = _personList.Count + 1,
+                IsVIP = true
+            };
+
+            _personList.Add(person);
+            int quad; 
+            int.TryParse(location, out quad);
+            AddPersonToDisplay(person, quad);
+        }
+
+        public void AddPersonToDisplay(Person person, int quadrant)
+        {
+            CreateNewTextBlock(person, CreateNewRandomAttr(person.IsVIP));
         }
 
         private void SetDataBindings()
@@ -118,43 +165,19 @@ namespace WOT.Server
 
             var bAddSpeed = new Binding { Source = Settings.Default, Path = new PropertyPath("ItemAddSpeed") };
             sldAddSpeed.SetBinding(RangeBase.ValueProperty, bAddSpeed);
-
-
         }
 
-        private static IList<Person> CreatePersonList()
+        public TextBlockAttribute CreateNewRandomAttr(bool? vip = false, int quadrant = 0)
         {
-            var list = new List<Person>();
 
-            for (int i = 1; i < 101; i++)
-            {
-                list.Add(new Person
-                {
-                    Name = "Person " + (i % 4 == 0 ? "VIP" : "") + i,
-                    Id = i,
-                    IsDonor = true,
-                    IsVIP = i % 4 == 0
-                });
-            }
-            return list;
-        }
-
-        void timer_Tick(object sender, EventArgs e)
-        {
-            _currentPerson = _personList.Next(_currentPerson);
-            var attr = CreateNewRandomAttr(_currentPerson.IsVIP);
-            CreateNewTextBlock(_currentPerson, attr);
-        }
-
-        public TextBlockAttribute CreateNewRandomAttr(bool? vip = false)
-        {
-            var leftMargin = Settings.Default.LeftMargin;
+            //var leftMargin = Settings.Default.LeftMargin;
+            var leftMargin = _quadSize*quadrant; 
             var rightMargin = _canvasWidth - Settings.Default.RightMargin;
             var maxFontSize = vip.GetValueOrDefault() ? Settings.Default.MaxFontSizeVIP : Settings.Default.MaxFontSize;
             var minFontSize = vip.GetValueOrDefault() ? Settings.Default.MinFontSizeVIP : Settings.Default.MinFontSize;
 
             var rnd = new Random();
-            var xAxis = rnd.Next(leftMargin, rightMargin.ToInt());
+            var xAxis = rnd.Next(leftMargin.ToInt(), rightMargin.ToInt());
             var yAxis = rnd.Next(0, 10);
             var size = rnd.Next(minFontSize, maxFontSize);
 
@@ -189,35 +212,18 @@ namespace WOT.Server
             return color;
         }
 
-        public void CreateNewTextBlock(Person person, TextBlockAttribute attr)
+        #region Events
+
+        private void ConnOnStateChanged(StateChange stateChange)
         {
-            var animation = new DoubleAnimation
-            {
-                From = attr.Top,
-                To = attr.Bottom,
-                Duration = new Duration(TimeSpan.FromSeconds(attr.Speed))
-            };
-            
-            var textBlock = new TextBlock
-            {
-                Name = "TextBlock" + person.Id,
-                Text = person.Name,
-                Tag = "TextBlock" + person.Id,
-                FontSize = attr.Size,
-                FontWeight = attr.Weight,
-                Foreground = new SolidColorBrush(attr.Color)
-            };
+            this.Dispatcher.Invoke(() => ConnectionStatus.Text = Conn.State.ToString());
+        }
 
-            var e = new AnimationEventArgs { TagName = textBlock.Name };
-            animation.Completed += (sender, args) => AnimationOnCompleted(e);
-
-            Canvas.SetLeft(textBlock, attr.Left);
-            Canvas.SetTop(textBlock, attr.Top);
-            Panel.SetZIndex(textBlock, attr.ZIndex);
-            _canvas.Children.Add(textBlock);
-
-            textBlock.BeginAnimation(TopProperty, animation);
-            GC.Collect();
+        void timer_Tick(object sender, EventArgs e)
+        {
+            _currentPerson = _personList.Next(_currentPerson);
+            var attr = CreateNewRandomAttr(_currentPerson.IsVIP);
+            CreateNewTextBlock(_currentPerson, attr);
         }
 
         private void AnimationOnCompleted(AnimationEventArgs eventArgs)
@@ -240,6 +246,12 @@ namespace WOT.Server
         {
             Settings.Default.Reset();
             Settings.Default.Reload();
+        }
+
+        private void BtnCloseApp_OnClick(object sender, RoutedEventArgs e)
+        {
+            Conn.Dispose();
+            mainWindow.Close();
         }
 
         private void sldAddSpeed_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -284,6 +296,9 @@ namespace WOT.Server
                 Settings.Default.MinFontSizeVIP = Settings.Default.MinFontSizeVIP - 1;
             }
         }
+
+        #endregion
+
 
     }
 
