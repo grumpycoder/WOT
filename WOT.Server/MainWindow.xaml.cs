@@ -26,6 +26,7 @@ namespace WOT.Server
         private readonly double _canvasHeight;
         private readonly double _quadSize; 
         private readonly DispatcherTimer timer;
+        private readonly AppContext db; 
 
         public string ServerURI = Settings.Default.ServerURI;
         public string HubName = Settings.Default.HubName; 
@@ -40,19 +41,20 @@ namespace WOT.Server
             _canvas.Height = SystemParameters.PrimaryScreenHeight;
             _canvas.Width = SystemParameters.PrimaryScreenWidth;
 
+            db = new AppContext();
             SetDataBindings();
             _canvas.UpdateLayout();
 
             _canvasWidth = _canvas.Width;
             _canvasHeight = _canvas.Height;
-            _quadSize = _canvasWidth/4; 
+            _quadSize = _canvasWidth/4;
             ExpanderSettings.Width = _canvasWidth;
 
-            timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed) };
+            timer = new DispatcherTimer(DispatcherPriority.Render) { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed) };
             timer.Tick += timer_Tick;
 
-            _personList = CreateLocalPersonList();
-
+            //_personList = CreateLocalPersonList();
+            _personList = db.Persons.ToList();
             timer.Start();
 
             ConnectAsync();
@@ -86,7 +88,7 @@ namespace WOT.Server
             {
                 list.Add(new Person
                 {
-                    Name = "Person " + (i % 4 == 0 ? "VIP" : "") + i,
+                    Firstname = "Person " + (i % 4 == 0 ? "VIP" : "") + i,
                     Id = i,
                     IsDonor = true,
                     IsVIP = i % 4 == 0
@@ -103,11 +105,10 @@ namespace WOT.Server
                 To = attr.Bottom,
                 Duration = new Duration(TimeSpan.FromSeconds(attr.Speed))
             };
-
             var textBlock = new TextBlock
             {
                 Name = "TextBlock" + person.Id,
-                Text = person.Name,
+                Text = person.ToString(),
                 Tag = "TextBlock" + person.Id,
                 FontSize = attr.Size,
                 FontWeight = attr.Weight,
@@ -123,14 +124,14 @@ namespace WOT.Server
             _canvas.Children.Add(textBlock);
 
             textBlock.BeginAnimation(TopProperty, animation);
-            GC.Collect();
+            //GC.Collect();
         }
 
         public void AddPersonToListFromKiosk(string name, string location)
         {
             var person = new Person()
             {
-                Name = name,
+                Firstname = name,
                 Id = _personList.Count + 1,
                 IsVIP = true
             };
