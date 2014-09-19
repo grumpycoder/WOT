@@ -136,5 +136,17 @@ namespace WOT.Server.Properties {
                 return ((string)(this["HubName"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool LocalMode {
+            get {
+                return ((bool)(this["LocalMode"]));
+            }
+            set {
+                this["LocalMode"] = value;
+            }
+        }
     }
 }

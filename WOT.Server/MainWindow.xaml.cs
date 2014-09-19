@@ -165,6 +165,10 @@ namespace WOT.Server
 
             var bAddSpeed = new Binding { Source = Settings.Default, Path = new PropertyPath("ItemAddSpeed") };
             sldAddSpeed.SetBinding(RangeBase.ValueProperty, bAddSpeed);
+
+            //var bTestMode = new Binding { Source = Settings.Default, Path = new PropertyPath("LocalMode") };
+            //ckTestMode.SetBinding(ToggleButton.IsCheckedProperty, bTestMode);
+
         }
 
         public TextBlockAttribute CreateNewRandomAttr(bool? vip = false, int quadrant = 0)

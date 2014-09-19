@@ -32,5 +32,8 @@
     <Setting Name="HubName" Type="System.String" Scope="Application">
       <Value Profile="(Default)">WallHub</Value>
     </Setting>
+    <Setting Name="LocalMode" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

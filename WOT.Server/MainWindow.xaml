@@ -73,6 +73,12 @@
                 <Setter Property="Foreground" Value="White"/>
                 <Setter Property="Margin" Value="3"/>
             </Style>
+            <Style x:Key="CheckStyle" TargetType="{x:Type CheckBox}">
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="FontFamily" Value="Calibri" />
+                <Setter Property="FontWeight" Value="Bold" />
+                <Setter Property="Foreground" Value="White"/>
+            </Style>
 
             <SolidColorBrush x:Key="Expander.MouseOver.Circle.Stroke" Color="#FF5593FF"/>
             <SolidColorBrush x:Key="Expander.MouseOver.Circle.Fill" Color="#FFF3F9FF"/>
@@ -402,6 +408,11 @@
                         <TextBlock x:Name="lblAddSpeed" Text="{Binding Value, ElementName=sldAddSpeed}" HorizontalAlignment="Center"/>
                     </StackPanel>
                 </GroupBox>
+
+                <!--<WrapPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <CheckBox Name="ckTestMode" Content="Test Mode" Style="{StaticResource CheckStyle}" >
+                    </CheckBox>
+                </WrapPanel>-->
 
                 <WrapPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" HorizontalAlignment="Right" VerticalAlignment="Bottom">
                     <Button x:Name="btnResetSettings" Style="{StaticResource MetroButton}" Content="Reset" Margin="3" Click="btnReset_Click" Panel.ZIndex="999" />
