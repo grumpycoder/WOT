@@ -52,6 +52,8 @@ namespace WOT.Server
             timer.Tick += timer_Tick;
 
             _personList = CreateLocalPersonList();
+            var db = new AppContext();
+            _personList = db.Persons.ToList(); 
 
             timer.Start();
 
@@ -86,7 +88,7 @@ namespace WOT.Server
             {
                 list.Add(new Person
                 {
-                    Name = "Person " + (i % 4 == 0 ? "VIP" : "") + i,
+                    Firstname = "Person " + (i % 4 == 0 ? "VIP" : "") + i,
                     Id = i,
                     IsDonor = true,
                     IsVIP = i % 4 == 0
@@ -107,7 +109,7 @@ namespace WOT.Server
             var textBlock = new TextBlock
             {
                 Name = "TextBlock" + person.Id,
-                Text = person.Name,
+                Text = person.ToString(),
                 Tag = "TextBlock" + person.Id,
                 FontSize = attr.Size,
                 FontWeight = attr.Weight,
@@ -130,7 +132,7 @@ namespace WOT.Server
         {
             var person = new Person()
             {
-                Name = name,
+                Firstname = name,
                 Id = _personList.Count + 1,
                 IsVIP = true
             };
