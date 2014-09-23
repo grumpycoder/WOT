@@ -6,11 +6,11 @@ namespace WOT.Server
 {
     public static class Extension
     {
-        public static T Next<T>(this IEnumerable<T> list, T current)
+        public static T Next<T>(this IEnumerable<T> list, T current, int? fromStartingPosition = 0)
         {
             try
             {
-                if (current == null) return list.FirstOrDefault();
+                if (current == null) return list.ElementAtOrDefault(fromStartingPosition ?? 0);
 
                 return list.SkipWhile(x => !x.Equals(current)).Skip(1).First();
             }
@@ -20,11 +20,11 @@ namespace WOT.Server
             }
         }
 
-        public static T Previous<T>(this IEnumerable<T> list, T current)
+        public static T Previous<T>(this IEnumerable<T> list, T current, int? fromStartingPosition = 0)
         {
             try
             {
-                if (current == null) return list.LastOrDefault();
+                if (current == null) return list.ElementAtOrDefault(fromStartingPosition ?? 0);
                 return list.TakeWhile(x => !x.Equals(current)).Last();
             }
             catch

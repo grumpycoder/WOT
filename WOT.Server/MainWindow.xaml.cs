@@ -20,15 +20,26 @@ namespace WOT.Server
     public partial class MainWindow
     {
         private Person _currentPerson;
+
+        private Person _currentPerson1;
+        private Person _currentPerson2;
+        private Person _currentPerson3;
+        private Person _currentPerson4;
+
         private readonly IList<Person> _personList;
         private readonly Canvas _canvas;
         private readonly double _canvasWidth;
         private readonly double _canvasHeight;
-        private readonly double _quadSize; 
+        private readonly double _quadSize;
         private readonly DispatcherTimer timer;
 
+        private readonly DispatcherTimer timer1;
+        private readonly DispatcherTimer timer2;
+        private readonly DispatcherTimer timer3;
+        private readonly DispatcherTimer timer4;
+
         public string ServerURI = Settings.Default.ServerURI;
-        public string HubName = Settings.Default.HubName; 
+        public string HubName = Settings.Default.HubName;
 
         public IHubProxy HubProxy { get; set; }
         public HubConnection Conn { get; set; }
@@ -45,17 +56,31 @@ namespace WOT.Server
 
             _canvasWidth = _canvas.Width;
             _canvasHeight = _canvas.Height;
-            _quadSize = _canvasWidth/4; 
+            _quadSize = _canvasWidth / 4;
             ExpanderSettings.Width = _canvasWidth;
 
-            timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed) };
-            timer.Tick += timer_Tick;
+            //timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed) };
+            //timer.Tick += timer_Tick;
+
+            timer1 = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed), Tag = 1 };
+            timer1.Tick += (s, args) => timer_Tick(timer1, ref _currentPerson1);
+            timer2 = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed), Tag = 2 };
+            timer2.Tick += (s, args) => timer_Tick(timer2, ref _currentPerson2);
+            timer3 = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed), Tag = 3 };
+            timer3.Tick += (s, args) => timer_Tick(timer3, ref _currentPerson3);
+            timer4 = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed), Tag = 4 };
+            timer4.Tick += (s, args) => timer_Tick(timer4, ref _currentPerson4);
+
 
             _personList = CreateLocalPersonList();
-            var db = new AppContext();
-            _personList = db.Persons.ToList(); 
+            //var db = new AppContext();
+            //_personList = db.Persons.ToList(); 
 
-            timer.Start();
+            //timer.Start();
+            timer1.Start();
+            timer2.Start();
+            timer3.Start();
+            timer4.Start();
 
             ConnectAsync();
         }
@@ -80,6 +105,12 @@ namespace WOT.Server
             Debug.WriteLine("Connected to server at {0}", ServerURI);
         }
 
+        private static Random random = new Random();
+        private int RandomNumber(int min, int max)
+        {
+            return random.Next(min, max);
+        }
+
         private static IList<Person> CreateLocalPersonList()
         {
             var list = new List<Person>();
@@ -95,6 +126,41 @@ namespace WOT.Server
                 });
             }
             return list;
+        }
+
+        public void CreateNewTextBlock(Person person, TextBlockAttribute attr, int quadrant)
+        {
+
+            var right = (_canvasWidth / 4 * quadrant).ToInt();
+            var left = (right - _quadSize).ToInt();
+
+            var animation = new DoubleAnimation
+            {
+                From = 10,
+                To = _canvasHeight,
+                Duration = new Duration(TimeSpan.FromSeconds(attr.Speed))
+            };
+            var textBlock = new TextBlock
+            {
+                Name = "TextBlock" + person.Id,
+                Text = person.ToString(),
+                Tag = "TextBlock" + person.Id,
+                FontSize = attr.Size,
+                FontWeight = attr.Weight,
+                Foreground = new SolidColorBrush(attr.Color)
+            };
+
+            var e = new AnimationEventArgs { TagName = textBlock.Name };
+            animation.Completed += (sender, args) => AnimationOnCompleted(e);
+
+            var pos = RandomNumber(left, right);
+            Canvas.SetLeft(textBlock, pos);
+            Canvas.SetTop(textBlock, attr.Top);
+            Panel.SetZIndex(textBlock, attr.ZIndex);
+            _canvas.Children.Add(textBlock);
+
+            textBlock.BeginAnimation(TopProperty, animation);
+            GC.Collect();
         }
 
         public void CreateNewTextBlock(Person person, TextBlockAttribute attr)
@@ -138,7 +204,7 @@ namespace WOT.Server
             };
 
             _personList.Add(person);
-            int quad; 
+            int quad;
             int.TryParse(location, out quad);
             AddPersonToDisplay(person, quad);
         }
@@ -177,7 +243,7 @@ namespace WOT.Server
         {
 
             //var leftMargin = Settings.Default.LeftMargin;
-            var leftMargin = _quadSize*quadrant; 
+            var leftMargin = _quadSize * quadrant;
             var rightMargin = _canvasWidth - Settings.Default.RightMargin;
             var maxFontSize = vip.GetValueOrDefault() ? Settings.Default.MaxFontSizeVIP : Settings.Default.MaxFontSize;
             var minFontSize = vip.GetValueOrDefault() ? Settings.Default.MinFontSizeVIP : Settings.Default.MinFontSize;
@@ -225,11 +291,66 @@ namespace WOT.Server
             this.Dispatcher.Invoke(() => ConnectionStatus.Text = Conn.State.ToString());
         }
 
-        void timer_Tick(object sender, EventArgs e)
+        void timer_Tick(object sender, ref Person person)
         {
-            _currentPerson = _personList.Next(_currentPerson);
-            var attr = CreateNewRandomAttr(_currentPerson.IsVIP);
-            CreateNewTextBlock(_currentPerson, attr);
+            var dt = (DispatcherTimer)(sender);
+            if (dt == null) return;
+            var quad = Convert.ToInt32(dt.Tag);
+
+            //switch (quad)
+            //{
+            //    case 1:
+            //        _currentPerson1 = _personList.Next(_currentPerson1, (_personList.Count - 1) / 4 * quad);
+            //        person = _currentPerson1;
+            //        break;
+            //    case 2:
+            //        _currentPerson2 = _personList.Next(_currentPerson2, (_personList.Count - 1) / 4 * quad);
+            //        person = _currentPerson2;
+            //        break;
+            //    case 3:
+            //        _currentPerson3 = _personList.Next(_currentPerson3, (_personList.Count - 1) / 4 * quad);
+            //        person = _currentPerson3;
+            //        break;
+            //    case 4:
+            //        person = _personList.Next(person, (_personList.Count - 1) / 4 * quad);
+            //        break;
+            //    default:
+            //        break;
+            //}
+            person = _personList.Next(person, (_personList.Count - 1) / 4 * quad);
+            var attr = CreateNewRandomAttr(person.IsVIP);
+            CreateNewTextBlock(person, attr, quad);
+
+            //if (quad == 1)
+            //{
+            //    _currentPerson1 = _personList.Next(_currentPerson1, (_personList.Count - 1) / 4 * quad);
+            //    attr = CreateNewRandomAttr(_currentPerson1.IsVIP);
+            //    CreateNewTextBlock(_currentPerson1, attr, quad);
+            //}
+            //if (quad == 2)
+            //{
+            //    _currentPerson2 = _personList.Next(_currentPerson2, (_personList.Count - 1) / 4 * quad);
+            //    attr = CreateNewRandomAttr(_currentPerson2.IsVIP);
+            //    CreateNewTextBlock(_currentPerson2, attr, quad);
+            //}
+            //if (quad == 3)
+            //{
+            //    _currentPerson3 = _personList.Next(_currentPerson3, (_personList.Count - 1) / 4 * quad);
+            //    attr = CreateNewRandomAttr(_currentPerson3.IsVIP);
+            //    CreateNewTextBlock(_currentPerson3, attr, quad);
+            //}
+            //if (quad == 4)
+            //{
+            //    _currentPerson4 = _personList.Next(_currentPerson4, (_personList.Count - 1) / 4 * quad);
+            //    attr = CreateNewRandomAttr(_currentPerson4.IsVIP);
+            //    CreateNewTextBlock(_currentPerson4, attr, quad);
+            //}
+            //_currentPerson = _personList.Next(_currentPerson);
+            //var attr = CreateNewRandomAttr(_currentPerson.IsVIP);
+            //CreateNewTextBlock(_currentPerson, attr, quad);
+            //_currentPerson = _personList.Next(_currentPerson);
+            //var attr = CreateNewRandomAttr(_currentPerson.IsVIP);
+            //CreateNewTextBlock(_currentPerson, attr);
         }
 
         private void AnimationOnCompleted(AnimationEventArgs eventArgs)
@@ -264,6 +385,11 @@ namespace WOT.Server
         {
             //Settings.Default.ItemAddSpeed = e.NewValue;
             if (timer != null) timer.Interval = TimeSpan.FromSeconds(e.NewValue);
+            if (timer1 != null) timer1.Interval = TimeSpan.FromSeconds(e.NewValue);
+            if (timer2 != null) timer2.Interval = TimeSpan.FromSeconds(e.NewValue);
+            if (timer3 != null) timer3.Interval = TimeSpan.FromSeconds(e.NewValue);
+            if (timer4 != null) timer4.Interval = TimeSpan.FromSeconds(e.NewValue);
+
         }
 
         private void SldScrollSpeed_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
