@@ -95,8 +95,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AnimationEventArgs.cs" />
     <Compile Include="Models\AppContext.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="TextBlockAttribute.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

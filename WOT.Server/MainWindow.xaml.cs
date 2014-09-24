@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Mime;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -19,30 +20,35 @@ namespace WOT.Server
 
     public partial class MainWindow
     {
-        private Person _currentPerson;
+        #region Variables
+
+        private static readonly Random random = new Random();
+        private const int TopMargin = 10;
 
         private Person _currentPerson1;
         private Person _currentPerson2;
         private Person _currentPerson3;
         private Person _currentPerson4;
-
         private readonly IList<Person> _personList;
+
         private readonly Canvas _canvas;
         private readonly double _canvasWidth;
         private readonly double _canvasHeight;
         private readonly double _quadSize;
-        private readonly DispatcherTimer timer;
+        private const double SpeedModifier = 10;
 
-        private readonly DispatcherTimer timer1;
-        private readonly DispatcherTimer timer2;
-        private readonly DispatcherTimer timer3;
-        private readonly DispatcherTimer timer4;
+        private readonly DispatcherTimer _timer1;
+        private readonly DispatcherTimer _timer2;
+        private readonly DispatcherTimer _timer3;
+        private readonly DispatcherTimer _timer4;
 
         public string ServerURI = Settings.Default.ServerURI;
         public string HubName = Settings.Default.HubName;
 
         public IHubProxy HubProxy { get; set; }
         public HubConnection Conn { get; set; }
+
+        #endregion
 
         public MainWindow()
         {
@@ -59,30 +65,120 @@ namespace WOT.Server
             _quadSize = _canvasWidth / 4;
             ExpanderSettings.Width = _canvasWidth;
 
-            //timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed) };
-            //timer.Tick += timer_Tick;
-
-            timer1 = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed), Tag = 1 };
-            timer1.Tick += (s, args) => timer_Tick(timer1, ref _currentPerson1);
-            timer2 = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed), Tag = 2 };
-            timer2.Tick += (s, args) => timer_Tick(timer2, ref _currentPerson2);
-            timer3 = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed), Tag = 3 };
-            timer3.Tick += (s, args) => timer_Tick(timer3, ref _currentPerson3);
-            timer4 = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed), Tag = 4 };
-            timer4.Tick += (s, args) => timer_Tick(timer4, ref _currentPerson4);
-
+            // Populate list of people
 
             _personList = CreateLocalPersonList();
             //var db = new AppContext();
             //_personList = db.Persons.ToList(); 
 
+
+            // Setup timers to add person names to display
+
+            //timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed) };
+            //timer.Tick += timer_Tick;
+            _timer1 = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed), Tag = 1 };
+            _timer1.Tick += (s, args) => timer_Tick(_timer1, ref _currentPerson1);
+            _timer2 = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed), Tag = 2 };
+            _timer2.Tick += (s, args) => timer_Tick(_timer2, ref _currentPerson2);
+            _timer3 = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed), Tag = 3 };
+            _timer3.Tick += (s, args) => timer_Tick(_timer3, ref _currentPerson3);
+            _timer4 = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed), Tag = 4 };
+            _timer4.Tick += (s, args) => timer_Tick(_timer4, ref _currentPerson4);
+
             //timer.Start();
-            timer1.Start();
-            timer2.Start();
-            timer3.Start();
-            timer4.Start();
+            _timer1.Start();
+            _timer2.Start();
+            _timer3.Start();
+            _timer4.Start();
 
             ConnectAsync();
+        }
+        
+        public int RandomNumber(int min, int max)
+        {
+            return random.Next(min, max);
+        }
+        
+        public void AddPersonToListFromKiosk(string name, string location)
+        {
+            var firstname = name.Split(' ')[0];
+            var lastname = name.Split(' ')[1];
+            var person = new Person()
+            {
+                Firstname = firstname,
+                Lastname = lastname,
+                Id = _personList.Count + 1,
+                IsVIP = true
+            };
+
+            _personList.Add(person);
+            int quad;
+            int.TryParse(location, out quad);
+            var textblock = GenerateDisplayTextBlock(person, quad);
+            AddTextBlockToDisplay(textblock);
+        }
+
+        public ScreenTextBlock GenerateDisplayTextBlock(Person person, int quadrant)
+        {
+            var rightMargin = (_canvasWidth / 4 * quadrant).ToInt();
+            var leftMargin = (rightMargin - _quadSize).ToInt();
+            var maxFontSize = person.IsVIP.GetValueOrDefault() ? Settings.Default.MaxFontSizeVIP : Settings.Default.MaxFontSize;
+            var minFontSize = person.IsVIP.GetValueOrDefault() ? Settings.Default.MinFontSizeVIP : Settings.Default.MinFontSize;
+            var size = RandomNumber(minFontSize, maxFontSize);
+            var speed = ((Settings.Default.DefaultScrollSpeed / (double)size) * SpeedModifier).ToInt();
+            var name = person.ToString().Replace(" ", string.Empty) + person.Id; 
+
+            var t = new ScreenTextBlock
+            {
+                TextBlock = new TextBlock
+                {
+                    Name = name,
+                    Text = person.ToString(),
+                    Tag = name,
+                    FontSize = RandomNumber(minFontSize, maxFontSize),
+                    FontWeight = FontWeights.Normal,
+                    Foreground = new SolidColorBrush(RandomColor())
+                },
+                Left = RandomNumber(leftMargin, rightMargin),
+                Top = TopMargin,
+                Animation = CreateAnimation(speed, name)
+            };
+
+            return t;
+        }
+
+        private void AddTextBlockToDisplay(ScreenTextBlock screenTextBlock)
+        {
+
+            Canvas.SetLeft(screenTextBlock.TextBlock, screenTextBlock.Left);
+            Canvas.SetTop(screenTextBlock.TextBlock, screenTextBlock.Top);
+            Panel.SetZIndex(screenTextBlock.TextBlock, screenTextBlock.ZIndex);
+            _canvas.Children.Add(screenTextBlock.TextBlock);
+
+            screenTextBlock.TextBlock.BeginAnimation(TopProperty, screenTextBlock.Animation);
+        }
+
+        private DoubleAnimation CreateAnimation(int speed, string textBlockName)
+        {
+            var animation = new DoubleAnimation
+            {
+                From = TopMargin,
+                To = _canvasHeight,
+                Duration = new Duration(TimeSpan.FromSeconds(speed))
+            };
+            var e = new AnimationEventArgs { TagName = textBlockName };
+            animation.Completed += (sender, args) => AnimationOnCompleted(e);
+
+            return animation;
+        }
+        
+        private Color RandomColor()
+        {
+            var r = Convert.ToByte(RandomNumber(0, 255));
+            var g = Convert.ToByte(RandomNumber(0, 255));
+            var b = Convert.ToByte(RandomNumber(0, 255));
+            var color = Color.FromRgb(r, g, b);
+            return color;
         }
 
         private async void ConnectAsync()
@@ -103,115 +199,6 @@ namespace WOT.Server
                 return;
             }
             Debug.WriteLine("Connected to server at {0}", ServerURI);
-        }
-
-        private static Random random = new Random();
-        private int RandomNumber(int min, int max)
-        {
-            return random.Next(min, max);
-        }
-
-        private static IList<Person> CreateLocalPersonList()
-        {
-            var list = new List<Person>();
-
-            for (int i = 1; i < 101; i++)
-            {
-                list.Add(new Person
-                {
-                    Firstname = "Person " + (i % 4 == 0 ? "VIP" : "") + i,
-                    Id = i,
-                    IsDonor = true,
-                    IsVIP = i % 4 == 0
-                });
-            }
-            return list;
-        }
-
-        public void CreateNewTextBlock(Person person, TextBlockAttribute attr, int quadrant)
-        {
-
-            var right = (_canvasWidth / 4 * quadrant).ToInt();
-            var left = (right - _quadSize).ToInt();
-
-            var animation = new DoubleAnimation
-            {
-                From = 10,
-                To = _canvasHeight,
-                Duration = new Duration(TimeSpan.FromSeconds(attr.Speed))
-            };
-            var textBlock = new TextBlock
-            {
-                Name = "TextBlock" + person.Id,
-                Text = person.ToString(),
-                Tag = "TextBlock" + person.Id,
-                FontSize = attr.Size,
-                FontWeight = attr.Weight,
-                Foreground = new SolidColorBrush(attr.Color)
-            };
-
-            var e = new AnimationEventArgs { TagName = textBlock.Name };
-            animation.Completed += (sender, args) => AnimationOnCompleted(e);
-
-            var pos = RandomNumber(left, right);
-            Canvas.SetLeft(textBlock, pos);
-            Canvas.SetTop(textBlock, attr.Top);
-            Panel.SetZIndex(textBlock, attr.ZIndex);
-            _canvas.Children.Add(textBlock);
-
-            textBlock.BeginAnimation(TopProperty, animation);
-            GC.Collect();
-        }
-
-        public void CreateNewTextBlock(Person person, TextBlockAttribute attr)
-        {
-            var animation = new DoubleAnimation
-            {
-                From = attr.Top,
-                To = attr.Bottom,
-                Duration = new Duration(TimeSpan.FromSeconds(attr.Speed))
-            };
-
-            var textBlock = new TextBlock
-            {
-                Name = "TextBlock" + person.Id,
-                Text = person.ToString(),
-                Tag = "TextBlock" + person.Id,
-                FontSize = attr.Size,
-                FontWeight = attr.Weight,
-                Foreground = new SolidColorBrush(attr.Color)
-            };
-
-            var e = new AnimationEventArgs { TagName = textBlock.Name };
-            animation.Completed += (sender, args) => AnimationOnCompleted(e);
-
-            Canvas.SetLeft(textBlock, attr.Left);
-            Canvas.SetTop(textBlock, attr.Top);
-            Panel.SetZIndex(textBlock, attr.ZIndex);
-            _canvas.Children.Add(textBlock);
-
-            textBlock.BeginAnimation(TopProperty, animation);
-            GC.Collect();
-        }
-
-        public void AddPersonToListFromKiosk(string name, string location)
-        {
-            var person = new Person()
-            {
-                Firstname = name,
-                Id = _personList.Count + 1,
-                IsVIP = true
-            };
-
-            _personList.Add(person);
-            int quad;
-            int.TryParse(location, out quad);
-            AddPersonToDisplay(person, quad);
-        }
-
-        public void AddPersonToDisplay(Person person, int quadrant)
-        {
-            CreateNewTextBlock(person, CreateNewRandomAttr(person.IsVIP));
         }
 
         private void SetDataBindings()
@@ -239,49 +226,21 @@ namespace WOT.Server
 
         }
 
-        public TextBlockAttribute CreateNewRandomAttr(bool? vip = false, int quadrant = 0)
+        private static IList<Person> CreateLocalPersonList()
         {
+            var list = new List<Person>();
 
-            //var leftMargin = Settings.Default.LeftMargin;
-            var leftMargin = _quadSize * quadrant;
-            var rightMargin = _canvasWidth - Settings.Default.RightMargin;
-            var maxFontSize = vip.GetValueOrDefault() ? Settings.Default.MaxFontSizeVIP : Settings.Default.MaxFontSize;
-            var minFontSize = vip.GetValueOrDefault() ? Settings.Default.MinFontSizeVIP : Settings.Default.MinFontSize;
-
-            var rnd = new Random();
-            var xAxis = rnd.Next(leftMargin.ToInt(), rightMargin.ToInt());
-            var yAxis = rnd.Next(0, 10);
-            var size = rnd.Next(minFontSize, maxFontSize);
-
-            var speed = (Settings.Default.DefaultScrollSpeed / (double)size) * 10;
-            var color = RandomColor();
-
-            var attr = new TextBlockAttribute
+            for (int i = 1; i < 101; i++)
             {
-                Left = xAxis,
-                Top = yAxis,
-                Bottom = _canvasHeight,
-                Speed = speed,
-                Size = size,
-                Color = color,
-            };
-            if (vip.GetValueOrDefault()) attr.ZIndex = 998;
-
-            rnd = null;
-            GC.Collect();
-            return attr;
-        }
-
-        private static Color RandomColor()
-        {
-            var rnd = new Random();
-            var r = Convert.ToByte(rnd.Next(0, 255));
-            var g = Convert.ToByte(rnd.Next(0, 255));
-            var b = Convert.ToByte(rnd.Next(0, 255));
-            var color = Color.FromRgb(r, g, b);
-            rnd = null;
-            GC.Collect();
-            return color;
+                list.Add(new Person
+                {
+                    Firstname = "Person " + (i % 4 == 0 ? "VIP" : "") + i,
+                    Id = i,
+                    IsDonor = true,
+                    IsVIP = i % 4 == 0
+                });
+            }
+            return list;
         }
 
         #region Events
@@ -295,62 +254,12 @@ namespace WOT.Server
         {
             var dt = (DispatcherTimer)(sender);
             if (dt == null) return;
+
             var quad = Convert.ToInt32(dt.Tag);
-
-            //switch (quad)
-            //{
-            //    case 1:
-            //        _currentPerson1 = _personList.Next(_currentPerson1, (_personList.Count - 1) / 4 * quad);
-            //        person = _currentPerson1;
-            //        break;
-            //    case 2:
-            //        _currentPerson2 = _personList.Next(_currentPerson2, (_personList.Count - 1) / 4 * quad);
-            //        person = _currentPerson2;
-            //        break;
-            //    case 3:
-            //        _currentPerson3 = _personList.Next(_currentPerson3, (_personList.Count - 1) / 4 * quad);
-            //        person = _currentPerson3;
-            //        break;
-            //    case 4:
-            //        person = _personList.Next(person, (_personList.Count - 1) / 4 * quad);
-            //        break;
-            //    default:
-            //        break;
-            //}
             person = _personList.Next(person, (_personList.Count - 1) / 4 * quad);
-            var attr = CreateNewRandomAttr(person.IsVIP);
-            CreateNewTextBlock(person, attr, quad);
 
-            //if (quad == 1)
-            //{
-            //    _currentPerson1 = _personList.Next(_currentPerson1, (_personList.Count - 1) / 4 * quad);
-            //    attr = CreateNewRandomAttr(_currentPerson1.IsVIP);
-            //    CreateNewTextBlock(_currentPerson1, attr, quad);
-            //}
-            //if (quad == 2)
-            //{
-            //    _currentPerson2 = _personList.Next(_currentPerson2, (_personList.Count - 1) / 4 * quad);
-            //    attr = CreateNewRandomAttr(_currentPerson2.IsVIP);
-            //    CreateNewTextBlock(_currentPerson2, attr, quad);
-            //}
-            //if (quad == 3)
-            //{
-            //    _currentPerson3 = _personList.Next(_currentPerson3, (_personList.Count - 1) / 4 * quad);
-            //    attr = CreateNewRandomAttr(_currentPerson3.IsVIP);
-            //    CreateNewTextBlock(_currentPerson3, attr, quad);
-            //}
-            //if (quad == 4)
-            //{
-            //    _currentPerson4 = _personList.Next(_currentPerson4, (_personList.Count - 1) / 4 * quad);
-            //    attr = CreateNewRandomAttr(_currentPerson4.IsVIP);
-            //    CreateNewTextBlock(_currentPerson4, attr, quad);
-            //}
-            //_currentPerson = _personList.Next(_currentPerson);
-            //var attr = CreateNewRandomAttr(_currentPerson.IsVIP);
-            //CreateNewTextBlock(_currentPerson, attr, quad);
-            //_currentPerson = _personList.Next(_currentPerson);
-            //var attr = CreateNewRandomAttr(_currentPerson.IsVIP);
-            //CreateNewTextBlock(_currentPerson, attr);
+            var textBlock = GenerateDisplayTextBlock(person, quad);
+            AddTextBlockToDisplay(textBlock);
         }
 
         private void AnimationOnCompleted(AnimationEventArgs eventArgs)
@@ -384,12 +293,10 @@ namespace WOT.Server
         private void sldAddSpeed_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             //Settings.Default.ItemAddSpeed = e.NewValue;
-            if (timer != null) timer.Interval = TimeSpan.FromSeconds(e.NewValue);
-            if (timer1 != null) timer1.Interval = TimeSpan.FromSeconds(e.NewValue);
-            if (timer2 != null) timer2.Interval = TimeSpan.FromSeconds(e.NewValue);
-            if (timer3 != null) timer3.Interval = TimeSpan.FromSeconds(e.NewValue);
-            if (timer4 != null) timer4.Interval = TimeSpan.FromSeconds(e.NewValue);
-
+            if (_timer1 != null) _timer1.Interval = TimeSpan.FromSeconds(e.NewValue);
+            if (_timer2 != null) _timer2.Interval = TimeSpan.FromSeconds(e.NewValue);
+            if (_timer3 != null) _timer3.Interval = TimeSpan.FromSeconds(e.NewValue);
+            if (_timer4 != null) _timer4.Interval = TimeSpan.FromSeconds(e.NewValue);
         }
 
         private void SldScrollSpeed_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -433,28 +340,4 @@ namespace WOT.Server
 
 
     }
-
-    public class AnimationEventArgs : EventArgs
-    {
-        public string TagName { get; set; }
-    }
-
-    public class TextBlockAttribute
-    {
-        public TextBlockAttribute()
-        {
-            Weight = FontWeights.Normal;
-            ZIndex = 1;
-        }
-
-        public int Left { get; set; }
-        public int Top { get; set; }
-        public double Bottom { get; set; }
-        public int Size { get; set; }
-        public double Speed { get; set; }
-        public int ZIndex { get; set; }
-        public FontWeight Weight { get; set; }
-        public Color Color { get; set; }
-    }
-
 }
