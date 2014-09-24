@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Mime;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -103,7 +103,7 @@ namespace WOT.Server
         {
             var firstname = name.Split(' ')[0];
             var lastname = name.Split(' ')[1];
-            var person = new Person()
+            var person = new Person
             {
                 Firstname = firstname,
                 Lastname = lastname,
@@ -120,6 +120,7 @@ namespace WOT.Server
 
         public ScreenTextBlock GenerateDisplayTextBlock(Person person, int quadrant)
         {
+            
             var rightMargin = (_canvasWidth / 4 * quadrant).ToInt();
             var leftMargin = (rightMargin - _quadSize).ToInt();
             var maxFontSize = person.IsVIP.GetValueOrDefault() ? Settings.Default.MaxFontSizeVIP : Settings.Default.MaxFontSize;
@@ -150,12 +151,12 @@ namespace WOT.Server
         private void AddTextBlockToDisplay(ScreenTextBlock screenTextBlock)
         {
 
-            Canvas.SetLeft(screenTextBlock.TextBlock, screenTextBlock.Left);
-            Canvas.SetTop(screenTextBlock.TextBlock, screenTextBlock.Top);
-            Panel.SetZIndex(screenTextBlock.TextBlock, screenTextBlock.ZIndex);
-            _canvas.Children.Add(screenTextBlock.TextBlock);
+                Canvas.SetLeft(screenTextBlock.TextBlock, screenTextBlock.Left);
+                Canvas.SetTop(screenTextBlock.TextBlock, screenTextBlock.Top);
+                Panel.SetZIndex(screenTextBlock.TextBlock, screenTextBlock.ZIndex);
+                _canvas.Children.Add(screenTextBlock.TextBlock);
 
-            screenTextBlock.TextBlock.BeginAnimation(TopProperty, screenTextBlock.Animation);
+                screenTextBlock.TextBlock.BeginAnimation(TopProperty, screenTextBlock.Animation);
         }
 
         private DoubleAnimation CreateAnimation(int speed, string textBlockName)
@@ -187,7 +188,7 @@ namespace WOT.Server
             Conn.StateChanged += ConnOnStateChanged;
             HubProxy = Conn.CreateHubProxy(HubName);
 
-            HubProxy.On<string, string>("sendName", (name, message) => this.Dispatcher.Invoke(() => AddPersonToListFromKiosk(message, name)));
+            HubProxy.On<string, string>("sendName", (name, message) => Dispatcher.Invoke(() => AddPersonToListFromKiosk(message, name)));
             try
             {
                 await Conn.Start();
@@ -221,9 +222,6 @@ namespace WOT.Server
             var bAddSpeed = new Binding { Source = Settings.Default, Path = new PropertyPath("ItemAddSpeed") };
             sldAddSpeed.SetBinding(RangeBase.ValueProperty, bAddSpeed);
 
-            //var bTestMode = new Binding { Source = Settings.Default, Path = new PropertyPath("LocalMode") };
-            //ckTestMode.SetBinding(ToggleButton.IsCheckedProperty, bTestMode);
-
         }
 
         private static IList<Person> CreateLocalPersonList()
@@ -247,7 +245,7 @@ namespace WOT.Server
 
         private void ConnOnStateChanged(StateChange stateChange)
         {
-            this.Dispatcher.Invoke(() => ConnectionStatus.Text = Conn.State.ToString());
+            Dispatcher.Invoke(() => ConnectionStatus.Text = Conn.State.ToString());
         }
 
         void timer_Tick(object sender, ref Person person)
@@ -292,16 +290,10 @@ namespace WOT.Server
 
         private void sldAddSpeed_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            //Settings.Default.ItemAddSpeed = e.NewValue;
             if (_timer1 != null) _timer1.Interval = TimeSpan.FromSeconds(e.NewValue);
             if (_timer2 != null) _timer2.Interval = TimeSpan.FromSeconds(e.NewValue);
             if (_timer3 != null) _timer3.Interval = TimeSpan.FromSeconds(e.NewValue);
             if (_timer4 != null) _timer4.Interval = TimeSpan.FromSeconds(e.NewValue);
-        }
-
-        private void SldScrollSpeed_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            //Settings.Default.DefaultScrollSpeed = e.NewValue.ToInt();
         }
 
         private void SldMaxFont_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

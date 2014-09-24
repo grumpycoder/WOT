@@ -6,18 +6,14 @@ using WOT.Kiosk.Properties;
 
 namespace WOT.Kiosk
 {
-
     public partial class MainWindow : Window
     {
-        public string KioskName = Settings.Default.KioskName;
-        public IHubProxy HubProxy { get; set; }
-        private readonly string ServerURI = Settings.Default.ServerURI;
         private readonly string HubName = Settings.Default.HubName;
-        public HubConnection Connection { get; set; }
-        
+        private readonly string ServerURI = Settings.Default.ServerURI;
+        public string KioskName = Settings.Default.KioskName;
+
         public MainWindow()
         {
-
             InitializeComponent();
 
             mainWindow.Height = Settings.Default.AppHeight;
@@ -26,6 +22,9 @@ namespace WOT.Kiosk
 
             //TODO: Try reconnect when server back online
         }
+
+        public IHubProxy HubProxy { get; set; }
+        public HubConnection Connection { get; set; }
 
         private void BtnSave_OnClick(object sender, RoutedEventArgs e)
         {
@@ -40,7 +39,7 @@ namespace WOT.Kiosk
             HubProxy = Connection.CreateHubProxy(HubName);
             HubProxy.On<string, string>("sendName",
                 (name, message) =>
-                    this.Dispatcher.Invoke(
+                    Dispatcher.Invoke(
                         () => StatusText.Content = String.Format("{0}: {1}\r", name, message)));
 
             try
@@ -50,7 +49,6 @@ namespace WOT.Kiosk
             catch (HttpRequestException e)
             {
                 //TODO: Log message of error
-                return;
             }
         }
 
@@ -58,18 +56,17 @@ namespace WOT.Kiosk
         {
             if (Connection.State == ConnectionState.Disconnected)
             {
-                this.Dispatcher.Invoke(() => StatusText.Content = "Disconnected");
+                Dispatcher.Invoke(() => StatusText.Content = "Disconnected");
             }
             if (Connection.State == ConnectionState.Connecting)
             {
-                this.Dispatcher.Invoke(() => StatusText.Content = "Connecting");
+                Dispatcher.Invoke(() => StatusText.Content = "Connecting");
             }
             if (Connection.State == ConnectionState.Connected)
             {
-                this.Dispatcher.Invoke(() => StatusText.Content = "Connected");
+                Dispatcher.Invoke(() => StatusText.Content = "Connected");
             }
-            this.Dispatcher.Invoke(() => StatusText.Content = Connection.State);
+            Dispatcher.Invoke(() => StatusText.Content = Connection.State);
         }
-
     }
 }

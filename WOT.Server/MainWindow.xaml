@@ -395,7 +395,7 @@
 
                 <GroupBox Grid.Row="1" Grid.Column="0" Header="How Slow to Scroll" Style="{StaticResource SettingGroupBoxStyle}">
                     <StackPanel>
-                        <Slider x:Name="sldScrollSpeed" TickPlacement="BottomRight" SmallChange="1" Maximum="30" Minimum="1" TickFrequency="1" LargeChange="5" IsSnapToTickEnabled="True" ValueChanged="SldScrollSpeed_OnValueChanged">
+                        <Slider x:Name="sldScrollSpeed" TickPlacement="BottomRight" SmallChange="1" Maximum="30" Minimum="1" TickFrequency="1" LargeChange="5" IsSnapToTickEnabled="True">
                         </Slider>
                         <TextBlock x:Name="lblScrollSpeed" Text="{Binding Value, ElementName=sldScrollSpeed}" HorizontalAlignment="Center"/>
                     </StackPanel>

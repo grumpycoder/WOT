@@ -1,12 +1,13 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 
 namespace WOT.Server
 {
-    public class TextBlockAttribute
+    public class ScreenTextBlock
     {
-        public TextBlockAttribute()
+        public ScreenTextBlock()
         {
             Weight = FontWeights.Normal;
             ZIndex = 1;
@@ -21,7 +22,7 @@ namespace WOT.Server
         public FontWeight Weight { get; set; }
         public Color Color { get; set; }
 
+        public TextBlock TextBlock { get; set; }
         public DoubleAnimation Animation { get; set; }
-
     }
 }
