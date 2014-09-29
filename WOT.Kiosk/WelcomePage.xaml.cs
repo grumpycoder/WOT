@@ -10,18 +10,29 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace WOT.Kiosk
 {
     /// <summary>
-    /// Interaction logic for FinishSuccess.xaml
+    /// Interaction logic for WelcomePage.xaml
     /// </summary>
-    public partial class FinishSuccess : Window
+    public partial class WelcomePage : Page
     {
-        public FinishSuccess()
+        public WelcomePage()
         {
             InitializeComponent();
+        }
+
+        private void btnFindName_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new FindNameStep1());
+        }
+
+        private void btnAddName_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new AddNameStep1());
         }
     }
 }

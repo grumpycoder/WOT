@@ -68,7 +68,45 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="FinishSuccess.xaml">
+    <Compile Include="AddNameStep1.xaml.cs">
+      <DependentUpon>AddNameStep1.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AddNameStep2.xaml.cs">
+      <DependentUpon>AddNameStep2.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AddNameStep3.xaml.cs">
+      <DependentUpon>AddNameStep3.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FindNameStep1.xaml.cs">
+      <DependentUpon>FindNameStep1.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FindNameStep2.xaml.cs">
+      <DependentUpon>FindNameStep2.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Person.cs" />
+    <Compile Include="Finish.xaml.cs">
+      <DependentUpon>Finish.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WelcomePage.xaml.cs">
+      <DependentUpon>WelcomePage.xaml</DependentUpon>
+    </Compile>
+    <Page Include="AddNameStep1.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AddNameStep2.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AddNameStep3.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FindNameStep1.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FindNameStep2.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -80,13 +118,18 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="FinishSuccess.xaml.cs">
-      <DependentUpon>FinishSuccess.xaml</DependentUpon>
-    </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Finish.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WelcomePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\Annotations.cs" />
@@ -116,6 +159,19 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\WheelText 001.jpg" />
+    <Resource Include="Assets\WheelText 002.jpg" />
+    <Resource Include="Assets\WheelText 003.jpg" />
+    <Resource Include="Assets\WheelText 004.jpg" />
+    <Resource Include="Assets\WheelText 005.jpg" />
+    <Resource Include="Assets\WheelText 006.jpg" />
+    <Resource Include="Assets\WheelText 007.jpg" />
+    <Resource Include="Assets\WheelText 008.jpg" />
+    <Resource Include="Assets\WheelText 009.jpg" />
+    <Resource Include="Assets\WheelText 010.jpg" />
+    <Resource Include="Assets\WheelText 011.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
