@@ -4,9 +4,22 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       mc:Ignorable="d" 
-      Height="800" Width="600" 
+      Height="768" Width="1024"
 	Title="FindNameStep2">
     <Page.Resources>
+        <Style x:Key="LabelBoxStyle" TargetType="{x:Type Label}">
+            <Setter Property="FontSize" Value="40" />
+            <Setter Property="Height" Value="55"></Setter>
+            <Setter Property="Width" Value="300"></Setter>
+            <Setter Property="Foreground" Value="White"></Setter>
+        </Style>
+        <Style x:Key="TextBoxStyle" TargetType="{x:Type TextBox}">
+            <Setter Property="FontSize" Value="50" />
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="Height" Value="55"></Setter>
+            <Setter Property="Width" Value="400"></Setter>
+            <Setter Property="Focusable" Value="True"></Setter>
+        </Style>
         <Style x:Key="TextBlockStyle" TargetType="{x:Type TextBlock}">
             <Setter Property="FontSize" Value="20"></Setter>
             <Setter Property="TextAlignment" Value="Center"></Setter>

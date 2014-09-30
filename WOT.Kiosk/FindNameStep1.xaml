@@ -4,7 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       mc:Ignorable="d" 
-      Height="800" Width="600" 
+      Height="768" Width="1024" 
 	Title="FindNameStep1">
 
     <Page.Resources>
@@ -12,23 +12,23 @@
             <EventSetter Event="Click" Handler="key_Click" />
             <Setter Property="HorizontalContentAlignment" Value="Center"></Setter>
             <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
-            <Setter Property="Width" Value="40"></Setter>
-            <Setter Property="Height" Value="35"></Setter>
+            <Setter Property="Width" Value="70"></Setter>
+            <Setter Property="Height" Value="65"></Setter>
             <Setter Property="Margin" Value="5"></Setter>
             <Setter Property="IsTabStop" Value="False"></Setter>
             <Setter Property="Focusable" Value="False"></Setter>
         </Style>
         <Style x:Key="LabelBoxStyle" TargetType="{x:Type Label}">
-            <Setter Property="FontSize" Value="25" />
-            <Setter Property="Height" Value="40"></Setter>
-            <Setter Property="Width" Value="250"></Setter>
+            <Setter Property="FontSize" Value="40" />
+            <Setter Property="Height" Value="55"></Setter>
+            <Setter Property="Width" Value="300"></Setter>
             <Setter Property="Foreground" Value="White"></Setter>
         </Style>
         <Style x:Key="TextBoxStyle" TargetType="{x:Type TextBox}">
-            <Setter Property="FontSize" Value="25" />
+            <Setter Property="FontSize" Value="50" />
             <Setter Property="TextAlignment" Value="Center"/>
-            <Setter Property="Height" Value="40"></Setter>
-            <Setter Property="Width" Value="250"></Setter>
+            <Setter Property="Height" Value="55"></Setter>
+            <Setter Property="Width" Value="500"></Setter>
             <Setter Property="Focusable" Value="True"></Setter>
             <EventSetter Event="GotKeyboardFocus" Handler="textbox_GotKeyboardFocus"></EventSetter>
             <EventSetter Event="LostKeyboardFocus" Handler="textbox_LostKeyboardFocus"></EventSetter>
@@ -75,7 +75,7 @@
         <TextBox x:Name="tbSearchName" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Style="{StaticResource TextBoxStyle}" TabIndex="0">
         </TextBox>
 
-        <StackPanel Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" Margin="10,100,10,0" Orientation="Vertical" HorizontalAlignment="Center">
+        <StackPanel Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button Style="{StaticResource KeyboardBtn}" Content="Q" />

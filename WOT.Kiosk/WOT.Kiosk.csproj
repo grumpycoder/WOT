@@ -161,17 +161,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Assets\WheelText 001.jpg" />
-    <Resource Include="Assets\WheelText 002.jpg" />
-    <Resource Include="Assets\WheelText 003.jpg" />
-    <Resource Include="Assets\WheelText 004.jpg" />
-    <Resource Include="Assets\WheelText 005.jpg" />
-    <Resource Include="Assets\WheelText 006.jpg" />
-    <Resource Include="Assets\WheelText 007.jpg" />
-    <Resource Include="Assets\WheelText 008.jpg" />
-    <Resource Include="Assets\WheelText 009.jpg" />
-    <Resource Include="Assets\WheelText 010.jpg" />
-    <Resource Include="Assets\WheelText 011.jpg" />
+    <Folder Include="Assets\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
