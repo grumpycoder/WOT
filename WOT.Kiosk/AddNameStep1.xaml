@@ -12,22 +12,24 @@
             <EventSetter Event="Click" Handler="key_Click" />
             <Setter Property="HorizontalContentAlignment" Value="Center"></Setter>
             <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
-            <Setter Property="Width" Value="70"></Setter>
-            <Setter Property="Height" Value="65"></Setter>
+            <Setter Property="Width" Value="75"></Setter>
+            <Setter Property="Height" Value="70"></Setter>
             <Setter Property="Margin" Value="5"></Setter>
+            <Setter Property="FontSize" Value="35"></Setter>
+            <Setter Property="FontStretch" Value="Condensed"></Setter>
             <Setter Property="IsTabStop" Value="False"></Setter>
             <Setter Property="Focusable" Value="False"></Setter>
         </Style>
         <Style x:Key="LabelBoxStyle" TargetType="{x:Type Label}">
-            <Setter Property="FontSize" Value="40" />
-            <Setter Property="Height" Value="55"></Setter>
+            <Setter Property="FontSize" Value="50" />
+            <Setter Property="Height" Value="70"></Setter>
             <Setter Property="Width" Value="300"></Setter>
             <Setter Property="Foreground" Value="White"></Setter>
         </Style>
         <Style x:Key="TextBoxStyle" TargetType="{x:Type TextBox}">
             <Setter Property="FontSize" Value="50" />
             <Setter Property="TextAlignment" Value="Center"/>
-            <Setter Property="Height" Value="55"></Setter>
+            <Setter Property="Height" Value="70"></Setter>
             <Setter Property="Width" Value="400"></Setter>
             <Setter Property="Focusable" Value="True"></Setter>
             <EventSetter Event="GotKeyboardFocus" Handler="textbox_GotKeyboardFocus"></EventSetter>
@@ -92,10 +94,10 @@
                 <Button Style="{StaticResource KeyboardBtn}" Content="I" />
                 <Button Style="{StaticResource KeyboardBtn}" Content="O" />
                 <Button Style="{StaticResource KeyboardBtn}" Content="P" />
-                <Button Style="{StaticResource KeyboardBtn}" Content="DEL" Width="65" />
+                <Button Style="{StaticResource KeyboardBtn}" Content="DEL" Width="80" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Style="{StaticResource KeyboardBtn}" Content="TAB" Width="65" Focusable="False" />
+                <Button Style="{StaticResource KeyboardBtn}" Content="TAB" Width="80" Focusable="False" />
                 <Button Style="{StaticResource KeyboardBtn}" Content="A"/>
                 <Button Style="{StaticResource KeyboardBtn}" Content="S"/>
                 <Button Style="{StaticResource KeyboardBtn}" Content="D"/>
@@ -117,7 +119,7 @@
                 <Button Style="{StaticResource KeyboardBtn}" Content="-" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Style="{StaticResource KeyboardBtn}" Content="SPACE" Width="300" />
+                <Button Style="{StaticResource KeyboardBtn}" Content="SPACE" Width="400" />
             </StackPanel>
         </StackPanel>
 

@@ -12,7 +12,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.AspNet.SignalR.Client;
+using Microsoft.AspNet.SignalR.Client.Hubs;
 using WOT.Kiosk.Models;
+using WOT.Kiosk.Properties;
 
 namespace WOT.Kiosk
 {
@@ -21,7 +24,8 @@ namespace WOT.Kiosk
     /// </summary>
     public partial class AddNameStep3 : Page
     {
-        private Person _person; 
+        private Person _person;
+        public string KioskName = Settings.Default.KioskName;
 
         public AddNameStep3(Person person)
         {
@@ -34,6 +38,7 @@ namespace WOT.Kiosk
         {
             //TODO: Add person to database and send to big screen app
 
+            ConnectionManager.HubProxy.Invoke("Send", KioskName, _person.ToString());
             NavigationService.Navigate(new FinishPage());
         }
 
