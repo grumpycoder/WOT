@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Mime;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -53,6 +56,10 @@ namespace WOT.Server
         public MainWindow()
         {
             InitializeComponent();
+            Timeline.DesiredFrameRateProperty.OverrideMetadata(
+                            typeof(Timeline),
+                            new FrameworkPropertyMetadata { DefaultValue = 80 }
+                            );
             _canvas = WallCanvas;
             _canvas.Height = SystemParameters.PrimaryScreenHeight;
             _canvas.Width = SystemParameters.PrimaryScreenWidth;
@@ -67,15 +74,11 @@ namespace WOT.Server
 
             // Populate list of people
 
-            _personList = CreateLocalPersonList();
-            //var db = new AppContext();
-            //_personList = db.Persons.ToList(); 
-
+            //_personList = CreateLocalPersonList();
+            var db = new AppContext();
+            _personList = db.Persons.ToList();
 
             // Setup timers to add person names to display
-
-            //timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed) };
-            //timer.Tick += timer_Tick;
             _timer1 = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed), Tag = 1 };
             _timer1.Tick += (s, args) => timer_Tick(_timer1, ref _currentPerson1);
             _timer2 = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed), Tag = 2 };
@@ -85,7 +88,6 @@ namespace WOT.Server
             _timer4 = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed), Tag = 4 };
             _timer4.Tick += (s, args) => timer_Tick(_timer4, ref _currentPerson4);
 
-            //timer.Start();
             _timer1.Start();
             _timer2.Start();
             _timer3.Start();
@@ -93,12 +95,12 @@ namespace WOT.Server
 
             ConnectAsync();
         }
-        
+
         public int RandomNumber(int min, int max)
         {
             return random.Next(min, max);
         }
-        
+
         public void AddPersonToListFromKiosk(string name, string location)
         {
             var firstname = name.Split(' ')[0];
@@ -120,21 +122,21 @@ namespace WOT.Server
 
         public ScreenTextBlock GenerateDisplayTextBlock(Person person, int quadrant)
         {
-            
+
             var rightMargin = (_canvasWidth / 4 * quadrant).ToInt();
             var leftMargin = (rightMargin - _quadSize).ToInt();
             var maxFontSize = person.IsVIP.GetValueOrDefault() ? Settings.Default.MaxFontSizeVIP : Settings.Default.MaxFontSize;
             var minFontSize = person.IsVIP.GetValueOrDefault() ? Settings.Default.MinFontSizeVIP : Settings.Default.MinFontSize;
             var size = RandomNumber(minFontSize, maxFontSize);
             var speed = ((Settings.Default.DefaultScrollSpeed / (double)size) * SpeedModifier).ToInt();
-            var name = person.ToString().Replace(" ", string.Empty) + person.Id; 
+            var name = Regex.Replace(person.Lastname + person.Id.ToString(), @"[^A-Za-z]+", "");
 
             var t = new ScreenTextBlock
             {
-                TextBlock = new TextBlock
+                TextBlock = new Label()
                 {
-                    Name = name,
-                    Text = person.ToString(),
+                    Name = Regex.Replace(person.Lastname + person.Id.ToString(), @"[^A-Za-z]+", ""),
+                    Content = person.ToString(),
                     Tag = name,
                     FontSize = RandomNumber(minFontSize, maxFontSize),
                     FontWeight = FontWeights.Normal,
@@ -143,20 +145,20 @@ namespace WOT.Server
                 Left = RandomNumber(leftMargin, rightMargin),
                 Top = TopMargin,
                 Animation = CreateAnimation(speed, name)
+                //Storyboard = CreateStoryBoard(speed, name)
             };
 
             return t;
         }
-
+        
         private void AddTextBlockToDisplay(ScreenTextBlock screenTextBlock)
         {
+            Canvas.SetLeft(screenTextBlock.TextBlock, screenTextBlock.Left);
+            Canvas.SetTop(screenTextBlock.TextBlock, screenTextBlock.Top);
+            Panel.SetZIndex(screenTextBlock.TextBlock, screenTextBlock.ZIndex);
+            _canvas.Children.Add(screenTextBlock.TextBlock);
 
-                Canvas.SetLeft(screenTextBlock.TextBlock, screenTextBlock.Left);
-                Canvas.SetTop(screenTextBlock.TextBlock, screenTextBlock.Top);
-                Panel.SetZIndex(screenTextBlock.TextBlock, screenTextBlock.ZIndex);
-                _canvas.Children.Add(screenTextBlock.TextBlock);
-
-                screenTextBlock.TextBlock.BeginAnimation(TopProperty, screenTextBlock.Animation);
+            screenTextBlock.TextBlock.BeginAnimation(TopProperty, screenTextBlock.Animation);
         }
 
         private DoubleAnimation CreateAnimation(int speed, string textBlockName)
@@ -172,7 +174,7 @@ namespace WOT.Server
 
             return animation;
         }
-        
+
         private Color RandomColor()
         {
             var r = Convert.ToByte(RandomNumber(0, 255));
@@ -267,7 +269,7 @@ namespace WOT.Server
 
             result.BeginAnimation(TopProperty, null);
             _canvas.Children.Remove(result);
-            GC.Collect();
+            //GC.Collect();
         }
 
         private void btnSaveSettings_Click(object sender, RoutedEventArgs e)

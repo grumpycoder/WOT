@@ -22,7 +22,8 @@ namespace WOT.Server
         public FontWeight Weight { get; set; }
         public Color Color { get; set; }
 
-        public TextBlock TextBlock { get; set; }
+        public Label TextBlock { get; set; }
         public DoubleAnimation Animation { get; set; }
+        public Storyboard Storyboard { get; set; }
     }
 }
