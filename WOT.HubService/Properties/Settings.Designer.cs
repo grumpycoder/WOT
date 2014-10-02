@@ -25,7 +25,7 @@ namespace WOT.HubService.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:8080")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://mlawrence-8/WOT:8080")]
         public string ServerURI {
             get {
                 return ((string)(this["ServerURI"]));

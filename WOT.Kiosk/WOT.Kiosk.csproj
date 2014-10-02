@@ -84,6 +84,7 @@
     <Compile Include="FindNameStep2.xaml.cs">
       <DependentUpon>FindNameStep2.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models\AppContext.cs" />
     <Compile Include="Models\Person.cs" />
     <Compile Include="Finish.xaml.cs">
       <DependentUpon>Finish.xaml</DependentUpon>

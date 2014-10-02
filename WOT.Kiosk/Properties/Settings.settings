@@ -12,7 +12,7 @@
       <Value Profile="(Default)">WallHub</Value>
     </Setting>
     <Setting Name="ServerURI" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">http://localhost:8080/signalr</Value>
+      <Value Profile="(Default)">http://mlawrence-8/wot:8080/signalr</Value>
     </Setting>
     <Setting Name="KioskName" Type="System.String" Scope="Application">
       <Value Profile="(Default)">4</Value>

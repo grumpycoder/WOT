@@ -52,7 +52,7 @@ namespace WOT.Kiosk.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:8080/signalr")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://mlawrence-8/wot:8080/signalr")]
         public string ServerURI {
             get {
                 return ((string)(this["ServerURI"]));

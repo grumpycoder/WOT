@@ -117,6 +117,8 @@
                 <Button Style="{StaticResource KeyboardBtn}" Content="N" />
                 <Button Style="{StaticResource KeyboardBtn}" Content="M" />
                 <Button Style="{StaticResource KeyboardBtn}" Content="-" />
+                <Button Style="{StaticResource KeyboardBtn}" Content="." />
+                <Button Style="{StaticResource KeyboardBtn}" Content="@" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button Style="{StaticResource KeyboardBtn}" Content="SPACE" Width="400" />

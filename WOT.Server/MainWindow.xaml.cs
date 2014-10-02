@@ -28,11 +28,13 @@ namespace WOT.Server
         private static readonly Random random = new Random();
         private const int TopMargin = 10;
 
+        private Person _currentPersonVIP;
         private Person _currentPerson1;
         private Person _currentPerson2;
         private Person _currentPerson3;
         private Person _currentPerson4;
         private readonly IList<Person> _personList;
+        private readonly IList<Person> _personVIPList;
 
         private readonly Canvas _canvas;
         private readonly double _canvasWidth;
@@ -40,6 +42,7 @@ namespace WOT.Server
         private readonly double _quadSize;
         private const double SpeedModifier = 10;
 
+        private readonly DispatcherTimer _timerVIP;
         private readonly DispatcherTimer _timer1;
         private readonly DispatcherTimer _timer2;
         private readonly DispatcherTimer _timer3;
@@ -74,11 +77,15 @@ namespace WOT.Server
 
             // Populate list of people
 
-            //_personList = CreateLocalPersonList();
+            //TODO: Create VIP list to run on seperate timer
+            _personVIPList = CreateLocalPersonList();
             var db = new AppContext();
             _personList = db.Persons.ToList();
 
             // Setup timers to add person names to display
+            _timerVIP = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed)};
+            _timerVIP.Tick += (s, args) => timer_Tick(_timerVIP, ref _currentPersonVIP);
+
             _timer1 = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed), Tag = 1 };
             _timer1.Tick += (s, args) => timer_Tick(_timer1, ref _currentPerson1);
             _timer2 = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed), Tag = 2 };
@@ -88,20 +95,182 @@ namespace WOT.Server
             _timer4 = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed), Tag = 4 };
             _timer4.Tick += (s, args) => timer_Tick(_timer4, ref _currentPerson4);
 
+            _timerVIP.Start();
             _timer1.Start();
             _timer2.Start();
             _timer3.Start();
             _timer4.Start();
+            //TODO: Remove this test
+            AddNewNameToDisplay(new Person() { Firstname = "Mark", Lastname = "Lawrence Lawrence Lawrence" }, 4);
 
             ConnectAsync();
         }
 
-        public int RandomNumber(int min, int max)
+        public void AddNewNameToDisplay(Person person, int quadrant)
         {
-            return random.Next(min, max);
+            var minFontSize = Settings.Default.MinFontSize + (Settings.Default.MinFontSize * .10).ToInt();
+            var maxFontSize = Settings.Default.MaxFontSize + (Settings.Default.MaxFontSize * .10).ToInt();
+            var speed = ((Settings.Default.DefaultScrollSpeed / (double)minFontSize) * SpeedModifier).ToInt();
+
+            var rightMargin = (_canvasWidth / 4 * quadrant).ToInt();
+            var leftMargin = (rightMargin - _quadSize).ToInt();
+            var left = RandomNumber(leftMargin, rightMargin);
+            var midPoint = _canvasHeight / 2;
+
+            // Create a name scope for the page.
+            NameScope.SetNameScope(this, new NameScope());
+            var myLabel = new Label() { Content = person.ToString(), FontSize = maxFontSize, Name = "label1", Foreground = new SolidColorBrush(Colors.White) };
+            this.RegisterName(myLabel.Name, myLabel);
+
+            // Correct left position if name is too long to fit within canvas right margin
+            myLabel.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
+            myLabel.Arrange(new Rect(myLabel.DesiredSize));
+            var w = myLabel.ActualWidth;
+            if ((left + w) > _canvasWidth)
+            {
+                left = left > (_canvasWidth - w).ToInt() ? (_canvasWidth - w).ToInt() : RandomNumber(leftMargin, (_canvasWidth - w).ToInt());
+            }
+
+            myLabel.FontSize = 1;
+
+            var growAnimation = new DoubleAnimation
+            {
+                From = 1,
+                To = maxFontSize,
+                Duration = new Duration(TimeSpan.FromSeconds(3)),
+                BeginTime = TimeSpan.FromSeconds(1)
+            };
+            Storyboard.SetTargetName(growAnimation, myLabel.Name);
+            Storyboard.SetTargetProperty(growAnimation, new PropertyPath(FontSizeProperty));
+
+            var shrinkAnimation = new DoubleAnimation
+            {
+                From = maxFontSize,
+                To = maxFontSize - maxFontSize * .20,
+                BeginTime = TimeSpan.FromSeconds(5),
+                Duration = new Duration(TimeSpan.FromSeconds(5))
+            };
+            Storyboard.SetTargetName(shrinkAnimation, myLabel.Name);
+            Storyboard.SetTargetProperty(shrinkAnimation, new PropertyPath(FontSizeProperty));
+
+            var upAnimation = new DoubleAnimation
+            {
+                From = midPoint,
+                To = TopMargin,
+                BeginTime = TimeSpan.FromSeconds(5),
+                Duration = new Duration(TimeSpan.FromSeconds(5))
+            };
+            Storyboard.SetTargetName(upAnimation, myLabel.Name);
+            Storyboard.SetTargetProperty(upAnimation, new PropertyPath(TopProperty));
+
+            var mySolidColorBrush = new SolidColorBrush { Color = Colors.White };
+            this.RegisterName("mySolidColorBrush", mySolidColorBrush);
+
+            myLabel.Foreground = mySolidColorBrush;
+
+            var colorAnimation = new ColorAnimation()
+            {
+                From = RandomColor(),
+                To = RandomColor(),
+                BeginTime = TimeSpan.FromSeconds(5),
+                Duration = new Duration(TimeSpan.FromSeconds(5))
+            };
+            Storyboard.SetTargetName(colorAnimation, "mySolidColorBrush");
+            Storyboard.SetTargetProperty(colorAnimation, new PropertyPath(SolidColorBrush.ColorProperty));
+
+
+            var fallAnimation = new DoubleAnimation
+            {
+                From = TopMargin,
+                To = _canvasHeight,
+                BeginTime = TimeSpan.FromSeconds(10),
+                Duration = new Duration(TimeSpan.FromSeconds(speed))
+            };
+            Storyboard.SetTargetName(fallAnimation, myLabel.Name);
+            Storyboard.SetTargetProperty(fallAnimation, new PropertyPath(TopProperty));
+
+            var myStoryboard = new Storyboard();
+            myStoryboard.Children.Add(growAnimation);
+            myStoryboard.Children.Add(shrinkAnimation);
+            myStoryboard.Children.Add(colorAnimation);
+            myStoryboard.Children.Add(upAnimation);
+            myStoryboard.Children.Add(fallAnimation);
+
+            Canvas.SetLeft(myLabel, left);
+
+            Canvas.SetTop(myLabel, midPoint);
+            Panel.SetZIndex(myLabel, 9999);
+            _canvas.Children.Add(myLabel);
+            _canvas.UpdateLayout();
+
+            myStoryboard.Begin(this);
+
         }
 
-        public void AddPersonToListFromKiosk(string name, string location)
+        private void AddNameToDisplay(Person person, int quadrant)
+        {
+            var maxFontSize = person.IsVIP.GetValueOrDefault() ? Settings.Default.MaxFontSizeVIP : Settings.Default.MaxFontSize;
+            var minFontSize = person.IsVIP.GetValueOrDefault() ? Settings.Default.MinFontSizeVIP : Settings.Default.MinFontSize;
+            var name = "label" + RandomNumber(1, 1000);
+
+            // Create a name scope for the page.
+            NameScope.SetNameScope(this, new NameScope());
+
+            var label = new Label()
+            {
+                Content = person.ToString(),
+                FontSize = RandomNumber(minFontSize, maxFontSize),
+                Name = name,
+                Tag = name,
+                Uid = name,
+                Foreground = new SolidColorBrush(RandomColor())
+            };
+            var speed = ((Settings.Default.DefaultScrollSpeed / (double)label.FontSize) * SpeedModifier).ToInt();
+            this.RegisterName(label.Name, label);
+
+            var rightMargin = quadrant == 0 ? _canvasWidth.ToInt() : (_canvasWidth / 4 * quadrant).ToInt();
+            var leftMargin = (rightMargin - _quadSize).ToInt();
+            if (quadrant == 0)
+            {
+                leftMargin = 0;
+            }
+
+            // Required to calculate actual size to determine overflow off viewable area
+            label.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
+            label.Arrange(new Rect(label.DesiredSize));
+
+            var width = label.ActualWidth;
+            var leftPos = RandomNumber(leftMargin, rightMargin);
+            if (leftPos + width > _canvasWidth)
+            {
+                leftPos = RandomNumber(leftMargin, (_canvasWidth - width).ToInt());
+            }
+
+            var fallAnimation = new DoubleAnimation
+            {
+                From = TopMargin,
+                To = _canvasHeight,
+                BeginTime = TimeSpan.FromSeconds(0),
+                Duration = new Duration(TimeSpan.FromSeconds(speed))
+            };
+            Storyboard.SetTargetName(fallAnimation, label.Name);
+            Storyboard.SetTargetProperty(fallAnimation, new PropertyPath(TopProperty));
+
+            var storyboard = new Storyboard();
+            storyboard.Children.Add(fallAnimation);
+
+            var e = new AnimationEventArgs { TagName = label.Uid };
+            storyboard.Completed += (sender, args) => StoryboardOnCompleted(e);
+            Canvas.SetLeft(label, leftPos);
+
+            Canvas.SetTop(label, TopMargin);
+            _canvas.Children.Add(label);
+            _canvas.UpdateLayout();
+
+            storyboard.Begin(this);
+        }
+
+        public void AddPersonToDisplayFromKiosk(string name, string location)
         {
             var firstname = name.Split(' ')[0];
             var lastname = name.Split(' ')[1];
@@ -116,13 +285,12 @@ namespace WOT.Server
             _personList.Add(person);
             int quad;
             int.TryParse(location, out quad);
-            var textblock = GenerateDisplayTextBlock(person, quad);
-            AddTextBlockToDisplay(textblock);
+            AddNewNameToDisplay(person, quad);
         }
+
 
         public ScreenTextBlock GenerateDisplayTextBlock(Person person, int quadrant)
         {
-
             var rightMargin = (_canvasWidth / 4 * quadrant).ToInt();
             var leftMargin = (rightMargin - _quadSize).ToInt();
             var maxFontSize = person.IsVIP.GetValueOrDefault() ? Settings.Default.MaxFontSizeVIP : Settings.Default.MaxFontSize;
@@ -136,6 +304,7 @@ namespace WOT.Server
                 TextBlock = new Label()
                 {
                     Name = Regex.Replace(person.Lastname + person.Id.ToString(), @"[^A-Za-z]+", ""),
+                    Uid = Regex.Replace(person.Lastname + person.Id.ToString(), @"[^A-Za-z]+", ""),
                     Content = person.ToString(),
                     Tag = name,
                     FontSize = RandomNumber(minFontSize, maxFontSize),
@@ -145,12 +314,20 @@ namespace WOT.Server
                 Left = RandomNumber(leftMargin, rightMargin),
                 Top = TopMargin,
                 Animation = CreateAnimation(speed, name)
-                //Storyboard = CreateStoryBoard(speed, name)
             };
+
+            // Correct left position if name is too long to fit within canvas right margin
+            t.TextBlock.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
+            t.TextBlock.Arrange(new Rect(t.TextBlock.DesiredSize));
+            var w = t.TextBlock.ActualWidth;
+            if ((t.Left + w) > _canvasWidth)
+            {
+                t.Left = RandomNumber(leftMargin, (_canvasWidth - w).ToInt());
+            }
 
             return t;
         }
-        
+
         private void AddTextBlockToDisplay(ScreenTextBlock screenTextBlock)
         {
             Canvas.SetLeft(screenTextBlock.TextBlock, screenTextBlock.Left);
@@ -175,6 +352,12 @@ namespace WOT.Server
             return animation;
         }
 
+
+        public int RandomNumber(int min, int max)
+        {
+            return random.Next(min, max);
+        }
+
         private Color RandomColor()
         {
             var r = Convert.ToByte(RandomNumber(0, 255));
@@ -190,7 +373,7 @@ namespace WOT.Server
             Conn.StateChanged += ConnOnStateChanged;
             HubProxy = Conn.CreateHubProxy(HubName);
 
-            HubProxy.On<string, string>("sendName", (name, message) => Dispatcher.Invoke(() => AddPersonToListFromKiosk(message, name)));
+            HubProxy.On<string, string>("sendName", (name, message) => Dispatcher.Invoke(() => AddPersonToDisplayFromKiosk(message, name)));
             try
             {
                 await Conn.Start();
@@ -255,17 +438,36 @@ namespace WOT.Server
             var dt = (DispatcherTimer)(sender);
             if (dt == null) return;
 
+            // Determine timer quadrant of screen responsible
             var quad = Convert.ToInt32(dt.Tag);
-            person = _personList.Next(person, (_personList.Count - 1) / 4 * quad);
 
-            var textBlock = GenerateDisplayTextBlock(person, quad);
-            AddTextBlockToDisplay(textBlock);
+            person = dt.Tag == null ? _personVIPList.Next(person) : _personList.Next(person, (_personList.Count - 1)/4*quad);
+
+            // Add name to screen
+            AddNameToDisplay(person, quad);
+
+            //var textBlock = GenerateDisplayTextBlock(person, quad);
+            //AddTextBlockToDisplay(textBlock);
+        }
+
+        private void StoryboardOnCompleted(AnimationEventArgs eventArgs)
+        {
+            var tagName = eventArgs.TagName;
+
+            foreach (UIElement child in _canvas.Children)
+            {
+                if (tagName != child.Uid) continue;
+                child.BeginAnimation(TopProperty, null);
+                _canvas.Children.Remove(child);
+                return;
+            }
         }
 
         private void AnimationOnCompleted(AnimationEventArgs eventArgs)
         {
             var tagName = eventArgs.TagName;
-            var result = _canvas.Children.Cast<FrameworkElement>().First(x => x.Tag != null && x.Tag.ToString() == tagName);
+
+            var result = _canvas.Children.Cast<FrameworkElement>().First(x => x.Uid != null && x.Uid.ToString() == tagName);
 
             result.BeginAnimation(TopProperty, null);
             _canvas.Children.Remove(result);

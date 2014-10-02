@@ -26,6 +26,7 @@ namespace WOT.Kiosk
     {
         private Person _person;
         public string KioskName = Settings.Default.KioskName;
+        private AppContext db = new AppContext();
 
         public AddNameStep3(Person person)
         {
@@ -37,7 +38,8 @@ namespace WOT.Kiosk
         private void btnAgree_Click(object sender, RoutedEventArgs e)
         {
             //TODO: Add person to database and send to big screen app
-
+            db.Persons.Add(_person);
+            db.SaveChanges();
             ConnectionManager.HubProxy.Invoke("Send", KioskName, _person.ToString());
             NavigationService.Navigate(new FinishPage());
         }
