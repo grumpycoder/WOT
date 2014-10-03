@@ -16,19 +16,17 @@ namespace WOT.Kiosk
 
         public static async void ConnectAsync()
         {
-            //Connection = new HubConnection(ServerURI);
             Connection.StateChanged += ConnectionOnStateChanged;
             HubProxy = Connection.CreateHubProxy(HubName);
-            //HubProxy.On<string, string>("sendName",
-            //    (name, message) =>
-            //        Dispatcher.Invoke(
-            //            () => StatusText.Content = String.Format("{0}: {1}\r", name, message)));
-
             try
             {
                 await Connection.Start();
             }
             catch (HttpRequestException e)
+            {
+                //TODO: Log message of error
+            }
+            catch (HttpClientException clientException)
             {
                 //TODO: Log message of error
             }

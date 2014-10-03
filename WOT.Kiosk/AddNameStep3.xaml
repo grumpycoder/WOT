@@ -53,7 +53,7 @@
             [Your Name Here]
         </TextBlock>
 
-        <Button x:Name="btnAgree" Style="{StaticResource ButtonStyle}" Grid.Row="2" Grid.Column="0" Content="I Agree" Click="btnAgree_Click" Width="400" Height="40" Grid.ColumnSpan="2" Margin="100,97,100,98" />
+        <Button x:Name="btnAgree" Style="{StaticResource ButtonStyle}" Grid.Row="2" Grid.Column="0" Content="I Agree" Click="btnAgree_Click" Width="400" Height="60" Grid.ColumnSpan="2" />
 
         <Button Content="BACK" Grid.Row="3" Grid.Column="0" Click="btnBack_Click" />
         <Button Name="btnCancel" Content="CANCEL" Grid.Row="3" Grid.Column="1" Click="btnCancel_Click" />

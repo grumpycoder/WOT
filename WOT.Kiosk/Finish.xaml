@@ -39,7 +39,7 @@
             <RowDefinition Height="80"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Style="{StaticResource TextBlockStyle}" Grid.Row="0">
+        <TextBlock Style="{StaticResource TextBlockStyle}" Grid.Row="0" Name="statusMessage">
             Thank you. Your name will appear on the Wall above you in a moment.
         </TextBlock>
 

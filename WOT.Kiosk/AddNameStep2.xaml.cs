@@ -1,27 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using Humanizer;
 using WOT.Kiosk.Models;
 
 namespace WOT.Kiosk
 {
-    /// <summary>
-    /// Interaction logic for AddNameStep2.xaml
-    /// </summary>
     public partial class AddNameStep2 : Page
     {
-        private Person _person; 
+        private readonly Person _person; 
         public AddNameStep2(Person person)
         {
             InitializeComponent();
@@ -35,7 +21,9 @@ namespace WOT.Kiosk
 
         private void btnContinue_Click(object sender, RoutedEventArgs e)
         {
-            _person.ZipCode = tbZipCode.Password;
+            _person.Lastname = _person.Lastname.Transform(To.LowerCase, To.TitleCase);
+            _person.Firstname = _person.Firstname.Transform(To.LowerCase, To.TitleCase);
+            _person.ZipCode = tbZipCode.Text;
             NavigationService.Navigate(new AddNameStep3(_person));
         }
 
@@ -43,7 +31,18 @@ namespace WOT.Kiosk
         {
             var btn = (Button)e.OriginalSource;
             var s = btn.Content.ToString();
-            tbZipCode.Password += s;
+
+            if (s == "DEL" && tbZipCode.Text.Length > 0)
+            {
+                tbZipCode.Text = tbZipCode.Text.Remove(tbZipCode.Text.Length - 1, 1);
+                return;
+            }
+
+            if (tbZipCode.Text.Length < tbZipCode.MaxLength && s != "DEL")
+            {
+                tbZipCode.Text += s;                
+            }
         }
+
     }
 }

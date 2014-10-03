@@ -1,32 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Microsoft.AspNet.SignalR.Client;
-using Microsoft.AspNet.SignalR.Client.Hubs;
 using WOT.Kiosk.Models;
 using WOT.Kiosk.Properties;
 
 namespace WOT.Kiosk
 {
-    /// <summary>
-    /// Interaction logic for AddNameStep3.xaml
-    /// </summary>
     public partial class AddNameStep3 : Page
     {
-        private Person _person;
+        private readonly Person _person;
         public string KioskName = Settings.Default.KioskName;
-        private AppContext db = new AppContext();
+        private readonly AppContext db = new AppContext();
 
         public AddNameStep3(Person person)
         {
@@ -37,11 +23,42 @@ namespace WOT.Kiosk
 
         private void btnAgree_Click(object sender, RoutedEventArgs e)
         {
-            //TODO: Add person to database and send to big screen app
-            db.Persons.Add(_person);
-            db.SaveChanges();
-            ConnectionManager.HubProxy.Invoke("Send", KioskName, _person.ToString());
-            NavigationService.Navigate(new FinishPage());
+            bool isSaved = false;
+            var message = string.Empty;
+            try
+            {
+                db.Persons.Add(_person);
+                db.SaveChanges();
+                isSaved = true;
+            }
+            catch (Exception exception)
+            {
+                //TODO: Log error of DB save operation and display message
+                Debug.WriteLine(exception);
+            }
+            switch (ConnectionManager.Connection.State)
+            {
+                case ConnectionState.Connected:
+                    ConnectionManager.HubProxy.Invoke("Send", KioskName, _person.ToString());
+                    break;
+                case ConnectionState.Disconnected:
+                    //TODO: Log error and display message of name not sent to display
+                    Debug.WriteLine("Connection is disconnected.");
+                    if (isSaved)
+                    {
+                        message +=
+                            "Your name has been saved, but currently unable to display your name on the Wall due to the connection is unavailable. " +
+                            "You can try later to find your name from the Welcome page and choose to display it the Wall.";
+                    }
+                    else
+                    {
+                        message +=
+                            "Your name has NOT been saved, and is unable to display your name on the Wall due to the connection is unavailable. " +
+                            "You can try later to enter your name again from the Welcome page.";
+                    }
+                    break;
+            }
+            NavigationService.Navigate(new FinishPage(message));
         }
 
         private void btnBack_Click(object sender, RoutedEventArgs e)
