@@ -43,7 +43,7 @@ namespace WOT.Kiosk.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("WallHub")]
+        [global::System.Configuration.DefaultSettingValueAttribute("MessageHub")]
         public string HubName {
             get {
                 return ((string)(this["HubName"]));

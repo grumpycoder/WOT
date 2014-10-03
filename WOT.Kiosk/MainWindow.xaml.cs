@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System.Diagnostics;
+using System.Windows;
+using Microsoft.AspNet.SignalR.Client;
 using WOT.Kiosk.Properties;
 
 namespace WOT.Kiosk
@@ -15,7 +17,6 @@ namespace WOT.Kiosk
 
             _mainFrame.Navigate(new WelcomePage());
 
-            //TODO: Try reconnect when server back online
         }
     }
 }

@@ -380,6 +380,7 @@ namespace WOT.Server
             }
             catch (HttpRequestException e)
             {
+                //TODO: Log connection error
                 Debug.WriteLine("Unable to connect to server: Start server before connecting clients");
                 Debug.WriteLine(e.InnerException.ToString());
                 return;
