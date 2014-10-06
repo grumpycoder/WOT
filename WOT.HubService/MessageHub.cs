@@ -10,7 +10,7 @@ namespace WOT.HubService
     {
         public Task SendMessage(string message)
         {
-            var formatedMessage = String.Format("{0}: {1}", LocalCache.Users[Context.ConnectionId], message);
+            var formatedMessage = String.Format("{0}:{1}: {2}", DateTime.Now, LocalCache.Users[Context.ConnectionId], message);
             Console.WriteLine(formatedMessage);
             return Clients.All.addMessage(formatedMessage);
         }
@@ -19,7 +19,7 @@ namespace WOT.HubService
         {
             LocalCache.Users.Add(Context.ConnectionId, username);
             Clients.Others.addMessage(username + " joined.");
-            Console.WriteLine(Context.ConnectionId + " (" + username + ") connected.");
+            Console.WriteLine("{0}:{1} ({2}) connected.", DateTime.Now, Context.ConnectionId, username);
             return true;
         }
 
@@ -33,26 +33,25 @@ namespace WOT.HubService
         {
             Clients.All.sendName(kiosk, message);
             Clients.All.reportStatus(kiosk, message);
-            Console.WriteLine("{0} sent {1}", kiosk, message);
+            Console.WriteLine("{0}:{1} sent {2}", DateTime.Now, kiosk, message);
         }
 
         public override Task OnConnected()
         {
-            Console.WriteLine("{0} Connected", Context.ConnectionId);
+            Console.WriteLine("{0}:{1} Connected", DateTime.Now, Context.ConnectionId);
             return base.OnConnected();
         }
 
         public override Task OnReconnected()
         {
-            Console.WriteLine("{0} Connected", Context.ConnectionId);
+            Console.WriteLine("{0}:{1} Connected", DateTime.Now, Context.ConnectionId);
             return base.OnReconnected();
         }
 
         public override Task OnDisconnected(bool stopCalled)
         {
             var username = LocalCache.Users[Context.ConnectionId];
-            Console.WriteLine(Context.ConnectionId + " (" + username + ") connected.");
-            Console.WriteLine("{0} Disconnected", Context.ConnectionId);
+            Console.WriteLine("{0}:{1} ({2}) Disconnected", DateTime.Now, Context.ConnectionId, username);
             return base.OnDisconnected(stopCalled);
         }
     }

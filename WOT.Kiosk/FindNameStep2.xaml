@@ -45,6 +45,18 @@
     </Page.Background>
 
     <Grid>
+        <Grid.Resources>
+            <DataTemplate x:Key="PersonItemTemplate">
+                <Grid ShowGridLines="False">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="900"/>
+                        <ColumnDefinition Width="100"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Path=FullName}" Grid.Column="0" HorizontalAlignment="Left"/>
+                    <TextBlock Text="{Binding Path=ZipCode}" Grid.Column="1" HorizontalAlignment="Left"/>
+                </Grid>
+            </DataTemplate>
+        </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
             <ColumnDefinition />
@@ -58,31 +70,20 @@
 
         <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Style="{StaticResource TextBlockStyle}" 
                    Text="Select your name, touch it in the list below." />
-        <ListBox HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Top" Grid.ColumnSpan="2" Grid.Column="0"
-                 Width="600" Height="580" FontSize="30">
-            <ListBoxItem Content="Item 1"/>
-            <ListBoxItem Content="Item 1"/>
-            <ListBoxItem Content="Item 2"/>
-            <ListBoxItem Content="Item 3"/>
-            <ListBoxItem Content="Item 4"/>
-            <ListBoxItem Content="Item 5"/>
-            <ListBoxItem Content="Item 6"/>
-            <ListBoxItem Content="Item 7"/>
-            <ListBoxItem Content="Item 8"/>
-            <ListBoxItem Content="Item 9"/>
-            <ListBoxItem Content="Item 10"/>
-            <ListBoxItem Content="Item 1"/>
-            <ListBoxItem Content="Item 1"/>
-            <ListBoxItem Content="Item 2"/>
-            <ListBoxItem Content="Item 3"/>
-            <ListBoxItem Content="Item 4"/>
-            <ListBoxItem Content="Item 5"/>
-            <ListBoxItem Content="Item 6"/>
-            <ListBoxItem Content="Item 7"/>
-            <ListBoxItem Content="Item 8"/>
-            <ListBoxItem Content="Item 9"/>
-            <ListBoxItem Content="Item 10"/>
+        
+        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+            
+        <TextBlock Style="{StaticResource TextBlockStyle}" HorizontalAlignment="Right" Margin="0,0,25,0">Zipcode</TextBlock>
+            
+        <ListBox HorizontalAlignment="Center" VerticalAlignment="Top" Grid.IsSharedSizeScope="True"
+                  Width="1010" Height="580" FontSize="30" Name="personList" ItemsSource="{Binding}" ItemTemplate="{StaticResource PersonItemTemplate}" >
         </ListBox>
+            
+        </StackPanel>
+
+        <TextBlock Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Style="{StaticResource TextBlockStyle}" HorizontalAlignment="Center" Margin="30,2,30,4"
+                   Text="If you are unable to find your name, you can return to the Welcome screen to take the pledge and add your name to the list.">
+        </TextBlock>
 
         <Button x:Name="btnBack" Content="BACK" Grid.Column="0" Grid.Row="4" Click="btnBack_Click" Focusable="False" IsTabStop="False"/>
         <Button x:Name="btnContinue" Content="THAT'S ME!" Grid.Column="1" Grid.Row="4" Click="btnContinue_Click" Focusable="False" IsTabStop="False" />

@@ -7,10 +7,10 @@ namespace WOT.Kiosk
 {
     public partial class FinishPage : Page
     {
-        public FinishPage(string message = null)
+        public FinishPage(string message)
         {
             InitializeComponent();
-            if (message != null)
+            if (!string.IsNullOrWhiteSpace(message))
             {
                 statusMessage.Text = message; 
             }

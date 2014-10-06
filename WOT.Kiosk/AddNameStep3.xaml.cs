@@ -23,7 +23,7 @@ namespace WOT.Kiosk
 
         private void btnAgree_Click(object sender, RoutedEventArgs e)
         {
-            bool isSaved = false;
+            var isSaved = false;
             var message = string.Empty;
             try
             {

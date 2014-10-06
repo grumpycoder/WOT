@@ -13,6 +13,7 @@ namespace WOT.Kiosk
         public FindNameStep1()
         {
             InitializeComponent();
+            tbSearchName.Focus();
         }
 
         private void btnBack_Click(object sender, RoutedEventArgs e)

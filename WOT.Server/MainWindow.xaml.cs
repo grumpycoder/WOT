@@ -76,11 +76,12 @@ namespace WOT.Server
             ExpanderSettings.Width = _canvasWidth;
 
             // Populate list of people
+            var db = new AppContext();
 
             //TODO: Create VIP list to run on seperate timer
-            _personVIPList = CreateLocalPersonList();
-            var db = new AppContext();
-            _personList = db.Persons.ToList();
+            //_personVIPList = CreateLocalPersonList();
+            _personVIPList = db.Persons.Where(x => x.IsVIP == true).ToList();
+            _personList = db.Persons.Where(x => x.IsVIP == false).ToList();
 
             // Setup timers to add person names to display
             _timerVIP = new DispatcherTimer { Interval = TimeSpan.FromSeconds(Settings.Default.ItemAddSpeed)};
@@ -383,6 +384,13 @@ namespace WOT.Server
                 //TODO: Log connection error
                 Debug.WriteLine("Unable to connect to server: Start server before connecting clients");
                 Debug.WriteLine(e.InnerException.ToString());
+                return;
+            }
+            catch (HttpClientException ce)
+            {
+                //TODO: Log connection error
+                Debug.WriteLine("Unable to connect to server: Start server before connecting clients");
+                Debug.WriteLine(ce.ToString());
                 return;
             }
             Debug.WriteLine("Connected to server at {0}", ServerURI);
